@@ -1,5 +1,12 @@
 .sheets-table {
-  overflow-x: scroll;
+  overflow: scroll;
+}
+
+.action-panel {
+  display: inline-flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .sheets-table__row:hover {
@@ -9,4 +16,12 @@
 
 .sheets-table .sheets-table__row--selected {
   background-color: lightblue;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.vh-80 {
+  height: 80vh;
 }

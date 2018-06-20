@@ -18,12 +18,13 @@ async function fillPDFs({ pdfPaths, outputFolder, nametag, quiet, data }) {
   try {
     await ensureFolderExists(outputFolder);
   } catch (err) {
-    console.err(`Output folder ${outputFolder} does not exist! Typo?`);
-    process.exit(1);
+    console.warn('Error relating to the outputFolder:', err);
+    throw new Error(`Output folder ${outputFolder} does not exist! Typo?`);
   }
 
   await verifyDataHaveNametags(nametag, data);
 
+  const filledForms = [];
   const formFills = pdfPaths
     .map(pdfPath =>
       data.map((row) => {
@@ -31,6 +32,7 @@ async function fillPDFs({ pdfPaths, outputFolder, nametag, quiet, data }) {
         const filename = `${path.parse(pdfPath).name}_${tag}.pdf`;
         const outputPath = path.join(outputFolder, filename);
         return fillPDF(pdfPath, outputPath, row).then(() => {
+          filledForms.push(outputPath);
           if (!quiet) {
             console.log(chalk.blue('Filled: '), filename);
           }
@@ -39,7 +41,7 @@ async function fillPDFs({ pdfPaths, outputFolder, nametag, quiet, data }) {
     )
     .reduce((a, i) => a.concat(i), []);
 
-  return Promise.all(formFills);
+  return Promise.all(formFills).then(() => filledForms);
 }
 
 async function fillFromCSV({ pdfPaths, csvPath, outputFolder, nametag, quiet }) {
@@ -62,17 +64,15 @@ function fillPDF(pdfPath, outputPath, data) {
 function verifyDataHaveNametags(nametag, data) {
   const tags = {};
   return data.every((row) => {
-    if (tags[nametag]) {
-      console.error(`Error: We found two rows with the same nametag: ${tags[nametag]}`);
-      process.exit(1);
+    if (tags[row[nametag]]) {
+      throw new Error(`There are two rows with the same nametag: ${tags[nametag]}`);
     }
 
     if (nametag in row) {
       tags[nametag] = row[nametag];
       return true;
     }
-    console.error(`Error: There is a row without a nametag. row's data: ${Object.values(row)}`);
-    process.exit(1);
+    throw new Error(`There is a row without a nametag. row's data: ${Object.values(row)}`);
   });
 }
 
