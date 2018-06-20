@@ -1,42 +1,59 @@
-const { promisify } = require('util')
-const { google } = require('googleapis')
+const { promisify } = require('util');
+const { google } = require('googleapis');
 
-const secrets = require('./../../secrets')
-const { authorize } = require('./authorize')
+const secrets = require('./../../secrets');
+const { authorize } = require('./authorize');
 
-const sheets = google.sheets('v4')
-const getValues = promisify(sheets.spreadsheets.values.get).bind(sheets)
+const sheets = google.sheets('v4');
+const getValues = promisify(sheets.spreadsheets.values.get).bind(sheets);
 
-async function loadFromGSheets(clientID) {
-  return await authorize()
-    .then(auth => {
-      return getValues({
+async function loadFromGSheets() {
+  return authorize()
+    .then(auth =>
+      getValues({
         spreadsheetId: secrets.sheets.indexSheetId,
         range: 'Index!A1:N2000',
-        auth
-      })
-    })
-    .then(res => {
-      const [header, ...rows] = res.data.values
-      const headerMap = header.reduce((acc, label, idx) => {
-        acc[label] = label in acc ? acc[label].concat([idx]) : [idx]
-        return acc
-      }, {})
-      const clientRow = rows.find(row => row[0] === String(clientID))
-      if (!clientRow) {
-        console.error(`We couldn't find any rows with the ID of ${clientID}`)
-        process.exit(1)
-      }
-      const clientData = clientRow.reduce((client, col, idx) => {
-        const entry = Object.entries(headerMap).find(([label, idxs]) =>
-          idxs.includes(idx)
-        )
-        client[entry[0]] = col
-        return client
-      }, {})
-      console.log('1281 client data:', clientData)
-    })
-    .catch(err => console.error('Error getting values:', err))
+        auth,
+      }),
+    )
+    .then((res) => {
+      const [labels, ...rows] = res.data.values;
+      return { labels, rows };
+    });
 }
 
-module.exports = loadFromGSheets
+async function loadClient(clientID) {
+  return loadFromGSheets().then(({ labels, rows }) => {
+    const clientRow = rows.find(row => row[0] === String(clientID));
+    return labelRows(labels, clientRow);
+  });
+}
+
+// // ['a', 'b'], [1, 2] => [['a', 1], ['b', 2]]
+// // [[label, value]]
+function labelRows(labels, rows) {
+  console.log('labels, rows:', labels, rows);
+  if (!Array.isArray(rows[0])) rows = [rows];
+  if (labels.length !== rows[0].length) {
+    throw new Error('Cannot zip labels and rows with non-equal length');
+  }
+
+  const labelMap = labels.reduce((acc, label, idx) => {
+    acc[label] = label in acc ? acc[label].concat([idx]) : [idx];
+    return acc;
+  }, {});
+
+  return rows.map(row =>
+    row.reduce((client, column, idx) => {
+      const [label] = Object.entries(labelMap).find(([_, idxs]) => idxs.includes(idx));
+      client[label] = column;
+      return client;
+    }, {}),
+  );
+}
+
+module.exports = {
+  loadFromGSheets,
+  loadClient,
+  labelRows,
+};

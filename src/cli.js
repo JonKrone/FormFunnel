@@ -1,25 +1,23 @@
-const yargs = require('yargs')
-const fillPDF = require('./index')
-const path = require('path')
-const { green } = require('chalk')
+const yargs = require('yargs');
+const { fillPDFs } = require('./index');
+const path = require('path');
+const { green } = require('chalk');
 
-const { listFields } = require('./validate-form')
-const loadFromGSheets = require('./GoogleSheets/load-from-gsheets')
+const { listFields } = require('./validate-form');
+const loadFromGSheets = require('./GoogleSheets/load-from-gsheets');
 
 yargs
-  .usage(
-    'pdfFiller: Your handy dandy tool to fill a bunch of PDFs with CSV data!'
-  )
+  .usage('pdfFiller: Your handy dandy tool to fill a bunch of PDFs with CSV data!')
   .command({
     command: 'listFields <pdfPath>',
     description: 'List the names of fields in a PDF',
     handler({ pdfPath }) {
-      listFields(pdfPath).then(fields => {
-        console.log(green('\nPDF:\t'), path.basename(pdfPath))
-        console.log(green('Fields:'))
-        fields.forEach(({ title }) => console.log('\t', title))
-      })
-    }
+      listFields(pdfPath).then((fields) => {
+        console.log(green('\nPDF:\t'), path.basename(pdfPath));
+        console.log(green('Fields:'));
+        fields.forEach(({ title }) => console.log('\t', title));
+      });
+    },
   })
   .command({
     command: 'loadFromGSheets [clientID]',
@@ -28,12 +26,12 @@ yargs
       clientID: {
         type: 'string',
         describe: 'The ID off the client to retrieve data from',
-        required: true
-      }
+        required: true,
+      },
     },
     handler({ clientID }) {
-      loadFromGSheets(clientID)
-    }
+      loadFromGSheets(clientID);
+    },
   })
   .command({
     command: 'fill [csvPath] [pdfPath] [outputFolder]',
@@ -42,29 +40,29 @@ yargs
       csvPath: {
         type: 'string',
         describe: 'Path to the CSV where the data is held',
-        required: true
+        required: true,
       },
       pdfPath: {
         type: 'string',
         describe: 'Path to the form-fillable PDF you want to fill',
-        required: true
+        required: true,
       },
       outputFolder: {
         type: 'string',
         describe: 'Path to the folder you want to save the filled PDFs',
-        required: true
+        required: true,
       },
-      outputNametag: {
+      nametag: {
         type: 'string',
         description: 'CSV column name to use in output filename',
-        required: true
+        required: true,
       },
       quiet: {
         type: 'boolean',
         describe: 'Less output?',
-        default: false
-      }
+        default: false,
+      },
     },
-    handler: fillPDF
+    handler: fillPDFs,
   })
-  .demandCommand(1, 'Must provide a command').argv
+  .demandCommand(1, 'Must provide a command').argv;
