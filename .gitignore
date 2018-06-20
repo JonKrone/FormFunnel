@@ -3,3 +3,7 @@ node_modules
 client_secret.json
 credentials.json
 secrets.js
+
+# electron-forge
+out/
+.eslintcache

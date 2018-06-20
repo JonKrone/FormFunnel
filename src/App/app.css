@@ -1,0 +1,12 @@
+.sheets-table {
+  overflow-x: scroll;
+}
+
+.sheets-table__row:hover {
+  background-color: lightblue;
+  cursor: pointer;
+}
+
+.sheets-table .sheets-table__row--selected {
+  background-color: lightblue;
+}
