@@ -10,7 +10,7 @@ const mkdir = promisify(fs.mkdir);
 
 const { parseCSV } = require('./parse-csv');
 
-async function fillPDFs({ pdfPaths, outputFolder, nametag, quiet, data }) {
+async function fillPDFs({ pdfPaths, outputFolder, quiet, data }) {
   if (!Array.isArray(pdfPaths)) {
     pdfPaths = [pdfPaths];
   }
@@ -22,19 +22,16 @@ async function fillPDFs({ pdfPaths, outputFolder, nametag, quiet, data }) {
     throw new Error(`Output folder ${outputFolder} does not exist! Typo?`);
   }
 
-  await verifyDataHaveNametags(nametag, data);
-
   const filledForms = [];
   const formFills = pdfPaths
     .map(pdfPath =>
       data.map((row) => {
-        const tag = row[nametag];
-        const filename = `${path.parse(pdfPath).name}_${tag}.pdf`;
-        const outputPath = path.join(outputFolder, filename);
+        const outputPath = path.join(outputFolder, path.parse(pdfPath).name);
         return fillPDF(pdfPath, outputPath, row).then(() => {
           filledForms.push(outputPath);
           if (!quiet) {
-            console.log(chalk.blue('Filled: '), filename);
+            const relativePart = outputPath.split('/').slice(-3);
+            console.log(chalk.blue('Filled: '), relativePart);
           }
         });
       }),
@@ -61,6 +58,7 @@ function fillPDF(pdfPath, outputPath, data) {
   return fill(pdfPath, outputPath, data, false);
 }
 
+/* eslint-disable no-unused-vars */
 function verifyDataHaveNametags(nametag, data) {
   const tags = {};
   return data.every((row) => {

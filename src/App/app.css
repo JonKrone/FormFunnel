@@ -18,10 +18,24 @@
   background-color: lightblue;
 }
 
+.disabled {
+  background-color: rgba(76, 100, 131, 0.65);
+  cursor: not-allowed;
+}
+
 .overflow-auto {
   overflow: auto;
 }
 
 .vh-80 {
   height: 80vh;
+}
+
+.mw-12rem {
+  max-width: 12rem;
+}
+
+.isLoading {
+  width: 100vw;
+  height: 100vh;
 }
