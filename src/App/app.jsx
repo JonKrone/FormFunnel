@@ -1,20 +1,28 @@
-import React from 'react';
-import cn from 'classnames';
-import { parse, join } from 'path';
-import { shell } from 'electron';
-import { groupBy } from 'ramda';
+import React from 'react'
+import cn from 'classnames'
+import { parse, join } from 'path'
+import { shell } from 'electron'
+import { groupBy } from 'ramda'
 
-import unhandled from 'electron-unhandled';
+import uuid from 'uuid/v4'
+import unhandled from 'electron-unhandled'
 
-import { loadFromGSheets, labelRows } from './../GoogleSheets/load-from-gsheets';
-import { fillPDFs } from './../fill-form';
-import store from './store';
-import ErrorBoundary from './ErrorBoundary';
+import { loadFromGSheets, labelRows } from './../GoogleSheets/load-from-gsheets'
+import { fillPDFs } from './../fill-form'
+import store from './store'
+import createLogger from './../logs/gcp-datastore'
+import ErrorBoundary from './ErrorBoundary'
 
-import { remote } from 'electron';
+import { remote } from 'electron'
 
-unhandled()
-const { dialog } = remote;
+const log = createLogger(store)
+window.log = log
+window.store = store
+const { dialog } = remote
+
+unhandled({
+  logger: log.error,
+})
 
 /**
  * <selectedDir>/<salesperson>/<customer name>/<original pdf name>
@@ -27,7 +35,7 @@ const { dialog } = remote;
 
 export default class App extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       isLoading: true,
       labels: [],
@@ -36,63 +44,95 @@ export default class App extends React.Component {
       selectedRow: [],
       selectedPDFs: [],
       outputRoot: store.get('outputRoot'),
-    };
-    this.selectRow = this.selectRow.bind(this);
-    this.fillEm = this.fillEm.bind(this);
-    this.addPDF = this.addPDF.bind(this);
-    this.removePDF = this.removePDF.bind(this);
-    this.showFolderSelect = this.showFolderSelect.bind(this);
-    this.filterRows = this.filterRows.bind(this);
+    }
+    this.selectRow = this.selectRow.bind(this)
+    this.fillEm = this.fillEm.bind(this)
+    this.addPDF = this.addPDF.bind(this)
+    this.removePDF = this.removePDF.bind(this)
+    this.showFolderSelect = this.showFolderSelect.bind(this)
+    this.filterRows = this.filterRows.bind(this)
   }
 
   componentWillMount() {
     loadFromGSheets().then(({ labels, rows }) => {
-      rows.reverse(); // most-recent first
-      this.setState({ isLoading: false, labels, data: rows, rows });
-    });
+      log({ type: 'gsheet-load' })
+      rows.reverse() // most-recent first
+      this.setState({ isLoading: false, labels, data: rows, rows })
+    })
   }
 
   selectRow(selectedIdx) {
-    const rowData = this.state.data[selectedIdx];
-    const isDeselecting = this.state.selectedRow === rowData;
-    const selectedRow = isDeselecting ? [] : rowData;
-    const utility = selectedRow[3];
-    const selectedPDFs = isDeselecting ? [] : store.get('utilityToPDFs')[utility] || [];
+    const rowData = this.state.rows[selectedIdx]
+    const isDeselecting = this.state.selectedRow === rowData
+    const selectedRow = isDeselecting ? [] : rowData
+    const utility = selectedRow[3]
+    const selectedPDFs = isDeselecting ? [] : store.get('utilityToPDFs')[utility] || []
 
     this.setState({
       selectedIdx,
       selectedRow,
       selectedPDFs,
-    });
+    })
+
+    log({
+      type: 'row-select',
+      idx: selectedIdx,
+    })
   }
 
   fillEm() {
-    console.log('filling');
+    const id = uuid()
     if (this.state.selectedRow.length <= 0) {
-      console.warn('Please select a row!');
-      return;
+      console.warn('Please select a row!')
+      return
     }
-    const pdfs = this.state.selectedPDFs;
+    const pdfs = this.state.selectedPDFs
     // const rows = this.state.selectedRow.map(idx => this.state.data[idx]);
-    const data = [this.state.selectedRow];
-    const labeledData = labelRows(this.state.labels, data)[0];
+    const data = [this.state.selectedRow]
+    const labeledData = labelRows(this.state.labels, data)[0]
     const outputFolder = join(
       this.state.outputRoot,
       labeledData.Salesperson,
       labeledData['Customer Name'],
-    );
+    )
 
     fillPDFs({
       pdfPaths: pdfs,
       data: [labeledData],
       outputFolder,
-    }).then((filled) => {
-      shell.showItemInFolder(filled[0]);
-      console.log('filled:', filled);
-    });
+    })
+      .then((filled) => {
+        shell.showItemInFolder(filled[0])
+        log({
+          type: 'fill-pdf',
+          id,
+          done: true,
+        })
+      })
+      .catch((err) => {
+        log({
+          type: 'fill-pdf',
+          id,
+          error: err,
+          done: true,
+        })
+        throw err
+      })
+
+    log({
+      type: 'fill-pdf',
+      id,
+      done: false,
+      outputFolder,
+      pdfCount: pdfs.length,
+    })
   }
 
   addPDF() {
+    log({
+      type: 'add-pdf',
+      action: 'open',
+    })
     dialog.showOpenDialog(
       {
         title: 'Select fillable PDFs',
@@ -103,49 +143,83 @@ export default class App extends React.Component {
         properties: ['openFile', 'multiSelections'],
       },
       (selectedPDFs) => {
-        if (!selectedPDFs) return;
+        if (!selectedPDFs) {
+          log({
+            type: 'add-pdf',
+            action: 'cancel'
+          })
+          return
+        }
         this.setState({ selectedPDFs: this.state.selectedPDFs.concat(selectedPDFs) }, () => {
-          store.set(`utilityToPDFs.${this.state.selectedRow[3]}`, this.state.selectedPDFs);
-        });
+          store.set(`utilityToPDFs.${this.state.selectedRow[3]}`, this.state.selectedPDFs)
+        })
+        log({
+          type: 'add-pdf',
+          action: 'close',
+          forUtility: this.state.selectedRow[3],
+          selectedCount: selectedPDFs.length,
+        })
       },
-    );
+    )
   }
 
   removePDF(path) {
-    const utility = this.state.selectedRow[3];
-    const selectedPDFs = this.state.selectedPDFs.filter(pdfPath => pdfPath !== path);
+    const utility = this.state.selectedRow[3]
+    const selectedPDFs = this.state.selectedPDFs.filter(pdfPath => pdfPath !== path)
     this.setState(
       {
         selectedPDFs,
       },
       () => {
-        store.set(`utilityToPDFs.${utility}`, selectedPDFs);
+        store.set(`utilityToPDFs.${utility}`, selectedPDFs)
       },
-    );
+    )
+
+    log({
+      type: 'remove-pdf',
+      forUtility: utility,
+    })
   }
 
   showFolderSelect() {
+    log({
+      type: 'output-folder',
+      action: 'open',
+    })
     dialog.showOpenDialog(
       { title: 'Where to save created PDF', properties: ['openDirectory'] },
       (folder) => {
-        if (!folder) return;
-        this.setState({ outputRoot: folder[0] });
-        store.set('outputRoot', folder[0]);
+        if (!folder) {
+          log({
+            type: 'output-folder',
+            action: 'cancel'
+          })
+          return
+        }
+        this.setState({ outputRoot: folder[0] })
+        store.set('outputRoot', folder[0])
+        log({
+          type: 'output-folder',
+          action: 'close'
+        })
       },
-    );
+    )
   }
 
   filterRows(e) {
-    const value = e.target.value.toLowerCase();
-    const data = this.state.data;
-    const rows = data.filter((row, idx) => !!row.find(col => col.toLowerCase().includes(value)));
+    const value = e.target.value.toLowerCase()
+    const data = this.state.data
+    const rows = data.filter((row, idx) => !!row.find(col => col.toLowerCase().includes(value)))
     this.setState({
       rows,
-    });
+    })
+    log({
+      type: 'filter-rows'
+    })
   }
 
   render() {
-    const { isLoading, labels, rows, selectedRow, selectedPDFs, outputRoot } = this.state;
+    const { isLoading, labels, rows, selectedRow, selectedPDFs, outputRoot } = this.state
     return (
       <ErrorBoundary>
         {labels ? (
@@ -178,9 +252,13 @@ export default class App extends React.Component {
             </div>
             <div className="flex items-center flex-column" />
           </React.Fragment>
-        ) : <div className="is-loading flex items-center justify-center"><div className="">We're loading!</div></div>}
+        ) : (
+          <div className="is-loading flex items-center justify-center">
+            <div className="">We're loading!</div>
+          </div>
+        )}
       </ErrorBoundary>
-    );
+    )
   }
 }
 
@@ -223,7 +301,7 @@ function ActionPanel({
         {!!outputRoot && <p className="f5 tc i">Saving to: {outputRoot}</p>}
       </div>
     </div>
-  );
+  )
 }
 
 function PDFCard({ path, removePDF }) {
@@ -240,7 +318,7 @@ function PDFCard({ path, removePDF }) {
         <a className="mt3 dark-blue fw6">{parse(path).name}</a>
       </div>
     </div>
-  );
+  )
 }
 
 function TableHeader({ labels }) {
@@ -254,7 +332,7 @@ function TableHeader({ labels }) {
         ))}
       </tr>
     </thead>
-  );
+  )
 }
 
 // TODO BUG: selectRow(idx) needs to select the idx of `data`, not `rows`
@@ -278,9 +356,9 @@ function TableRows({ rows, selectedRow, selectRow }) {
         </tr>
       ))}
     </tbody>
-  );
+  )
 }
 
 function createOutputFolder(root, salesperson, customer) {
-  return join(root, salesperson, customer);
+  return join(root, salesperson, customer)
 }
