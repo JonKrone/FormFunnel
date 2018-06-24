@@ -2,20 +2,24 @@
   overflow: scroll;
 }
 
-.action-panel {
-  display: inline-flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-}
-
 .sheets-table__row:hover {
-  background-color: lightblue;
+  background-color: lightblue !important;
   cursor: pointer;
 }
 
 .sheets-table .sheets-table__row--selected {
   background-color: lightblue;
+}
+
+.striped--near-white:nth-child(even) {
+  background-color: white;
+}
+
+.action-panel {
+  display: inline-flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
 
 .disabled {
