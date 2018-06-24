@@ -1,5 +1,7 @@
 node_modules
 
+# Secrets
+Sheets to PDF-c352f25c1508.json
 client_secret.json
 credentials.json
 secrets.js
