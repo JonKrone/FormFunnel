@@ -219,16 +219,16 @@ export default class App extends React.Component {
       <ErrorBoundary>
         {labels ? (
           <React.Fragment>
-            <div className="mt4 flex flex-row">
+            <div className="mt2 flex flex-row">
               <div className="w-two-thirds flex-column items-baseline">
                 <input
-                  className="mv2 mh4 pv2 ph3 ba br2"
+                  className="mv2 mh3 pv2 ph3 ba br2"
                   type="text"
                   placeholder="Filter"
                   onChange={this.filterRows}
                   autoFocus
                 />
-                <div className="vh-80 ph3 br2 overflow-auto">
+                <div className="sheets-table__cont pr3 br2 overflow-auto">
                   <Scrollbars>
                     <table className="sheets-table mh3 collapse ba b--black-10">
                       <TableHeader labels={labels} />
