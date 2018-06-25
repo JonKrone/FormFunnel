@@ -49,8 +49,8 @@ body {
   overflow: auto;
 }
 
-.vh-80 {
-  height: 85vh;
+.sheets-table__cont {
+  height: 92vh;
 }
 
 .mw-12rem {
