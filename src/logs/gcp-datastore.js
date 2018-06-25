@@ -73,7 +73,7 @@ module.exports = function createLoger(store) {
 }
 
 function initSession(store, sessionId) {
-  const isProd = false
+  const isProd = process.env.NODE_ENV === 'production'
   const user = isProd ? 'david' : 'dev'
   const userKey = datastore.key(['User', user])
 
