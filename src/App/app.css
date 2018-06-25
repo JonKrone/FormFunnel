@@ -1,3 +1,12 @@
+body {
+  font-size: 0.75rem;
+}
+
+.loading-msg {
+  height: 100vh;
+  width: 100vw;
+}
+
 .sheets-table {
   overflow: scroll;
 }
@@ -11,19 +20,28 @@
   background-color: lightblue;
 }
 
-.striped--near-white:nth-child(even) {
-  background-color: white;
+.pdf-list {
+  height: 100%;
+  align-items: center;
+}
+
+.pdf {
+  height: 33%;
 }
 
 .action-panel {
   display: inline-flex;
-  justify-content: center;
+  justify-content: flex-end;
   flex-direction: column;
   align-items: center;
 }
 
+.striped--near-white:nth-child(even) {
+  background-color: white;
+}
+
 .disabled {
-  background-color: rgba(76, 100, 131, 0.65);
+  background-color: rgba(76, 100, 131, 0.75);
   cursor: not-allowed;
 }
 
@@ -32,7 +50,7 @@
 }
 
 .vh-80 {
-  height: 80vh;
+  height: 85vh;
 }
 
 .mw-12rem {
