@@ -7,7 +7,7 @@
   cursor: pointer;
 }
 
-.sheets-table .sheets-table__row--selected {
+.sheets-table tr.sheets-table__row--selected {
   background-color: lightblue;
 }
 
