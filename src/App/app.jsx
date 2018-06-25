@@ -2,10 +2,10 @@ import React from 'react'
 import cn from 'classnames'
 import { parse, join } from 'path'
 import { shell } from 'electron'
-import { groupBy } from 'ramda'
-
-import uuid from 'uuid/v4'
 import unhandled from 'electron-unhandled'
+import { Scrollbars } from 'react-custom-scrollbars'
+import { groupBy } from 'ramda'
+import uuid from 'uuid/v4'
 
 import { loadFromGSheets, labelRows } from './../GoogleSheets/load-from-gsheets'
 import { fillPDFs } from './../fill-form'
@@ -24,15 +24,6 @@ unhandled({
   logger: log.error,
 })
 
-/**
- * <selectedDir>/<salesperson>/<customer name>/<original pdf name>
- *
- * Error if <salesperson> or <customer name> doesn't exist
- *
- * signrequest.com
- *
- */
-
 export default class App extends React.Component {
   constructor(props) {
     super(props)
@@ -50,15 +41,13 @@ export default class App extends React.Component {
     this.addPDF = this.addPDF.bind(this)
     this.removePDF = this.removePDF.bind(this)
     this.showFolderSelect = this.showFolderSelect.bind(this)
-    this.filterRows = this.filterRows.bind(this)
-    this.dbLog = debounce(log, 1000)
+    this.filterRows = debounceFilter(this.filterRows.bind(this))
   }
 
   componentWillMount() {
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
       rows.reverse() // most-recent first
-      rows = rows.slice(0, 50)
       this.setState({ isLoading: false, labels, data: rows, rows })
     })
   }
@@ -83,13 +72,11 @@ export default class App extends React.Component {
   }
 
   fillEm() {
-    const id = uuid()
     if (this.state.selectedRow.length <= 0) {
       console.warn('Please select a row!')
       return
     }
     const pdfs = this.state.selectedPDFs
-    // const rows = this.state.selectedRow.map(idx => this.state.data[idx]);
     const data = [this.state.selectedRow]
     const labeledData = labelRows(this.state.labels, data)[0]
     const outputFolder = join(
@@ -107,14 +94,12 @@ export default class App extends React.Component {
         shell.showItemInFolder(filled[0])
         log({
           type: 'fill-pdf',
-          id,
           done: true,
         })
       })
       .catch((err) => {
         log({
           type: 'fill-pdf',
-          id,
           error: err,
           done: true,
         })
@@ -123,7 +108,6 @@ export default class App extends React.Component {
 
     log({
       type: 'fill-pdf',
-      id,
       done: false,
       outputFolder,
       pdfCount: pdfs.length,
@@ -133,7 +117,7 @@ export default class App extends React.Component {
   addPDF() {
     log({
       type: 'add-pdf',
-      action: 'open'
+      action: 'open',
     })
     dialog.showOpenDialog(
       {
@@ -148,13 +132,19 @@ export default class App extends React.Component {
         if (!selectedPDFs) {
           log({
             type: 'add-pdf',
-            action: 'cancel'
+            action: 'cancel',
           })
           return
         }
+
+        if (this.state.selectedPDFs.includes(selectedPDFs[0])) {
+          return
+        }
+
         this.setState({ selectedPDFs: this.state.selectedPDFs.concat(selectedPDFs) }, () => {
           store.set(`utilityToPDFs.${this.state.selectedRow[3]}`, this.state.selectedPDFs)
         })
+
         log({
           type: 'add-pdf',
           action: 'close',
@@ -194,7 +184,7 @@ export default class App extends React.Component {
         if (!folder) {
           log({
             type: 'output-folder',
-            action: 'cancel'
+            action: 'cancel',
           })
           return
         }
@@ -202,27 +192,29 @@ export default class App extends React.Component {
         store.set('outputRoot', folder[0])
         log({
           type: 'output-folder',
-          action: 'close'
+          action: 'close',
         })
       },
     )
   }
 
-  filterRows(e) {
-    const value = e.target.value.toLowerCase()
+  filterRows(value) {
     const data = this.state.data
     const rows = data.filter((row, idx) => !!row.find(col => col.toLowerCase().includes(value)))
     this.setState({
       rows,
     })
 
-    this.dbLog({
-      type: 'filter-rows'
+    log({
+      type: 'filter-rows',
     })
   }
 
   render() {
     const { isLoading, labels, rows, selectedRow, selectedPDFs, outputRoot } = this.state
+    if (isLoading) {
+      return (<div className="loading-msg flex flex-column items-center justify-center f1">Loading . . .</div>)
+    }
     return (
       <ErrorBoundary>
         {labels ? (
@@ -230,17 +222,19 @@ export default class App extends React.Component {
             <div className="mt4 flex flex-row">
               <div className="w-two-thirds flex-column items-baseline">
                 <input
-                  className="mv3 mh4 pv2 ph3 ba br2"
+                  className="mv2 mh4 pv2 ph3 ba br2"
                   type="text"
                   placeholder="Filter"
                   onChange={this.filterRows}
                   autoFocus
                 />
                 <div className="vh-80 ph3 br2 overflow-auto">
-                  <table className="sheets-table mh3 collapse ba b--black-10">
-                    <TableHeader labels={labels} />
-                    <TableRows rows={rows} selectedRow={selectedRow} selectRow={this.selectRow} />
-                  </table>
+                  <Scrollbars>
+                    <table className="sheets-table mh3 collapse ba b--black-10">
+                      <TableHeader labels={labels} />
+                      <TableRows rows={rows} selectedRow={selectedRow} selectRow={this.selectRow} />
+                    </table>
+                  </Scrollbars>
                 </div>
               </div>
               <ActionPanel
@@ -274,43 +268,45 @@ function ActionPanel({
   fillEm,
   outputRoot,
 }) {
+  const hasPDFs = !!selectedPDFs.length
   return (
     <div className="w-third action-panel">
-      {!!selectedPDFs.length && (
-        <div className="w-100 flex flex-wrap justify-around mv4">
-          {selectedPDFs.map(path => (
-            <PDFCard path={path} key={path + String(Math.random())} removePDF={removePDF} />
-          ))}
+      {hasPDFs && (
+        <div className="pdf-list w-100 flex flex-wrap justify-around mv4">
+          {selectedPDFs.map(path => <PDFCard path={path} key={path} removePDF={removePDF} />)}
         </div>
       )}
       <button
         type="button"
         className={cn(
-          { disabled: !readyToFill, pointer: readyToFill },
-          'f1 ph4 pv3 mv4 mb4 link br3 dib white bg-dark-blue',
+          {
+            disabled: !readyToFill,
+            pointer: readyToFill,
+            pv3: !hasPDFs,
+            'pt3 pb4': hasPDFs,
+          },
+          'f1 ph4 mv4 mb4 link br3 dib white bg-dark-blue',
         )}
         disabled={!readyToFill}
         onClick={fillEm}
       >
         Fill 'em!
       </button>
-      <div>
-        <a className="grow f3 ph4 underline dark-blue pointer" onClick={addPDF}>
-          Add a PDF
-        </a>
-        <a className="grow f3 ph4 underline dark-blue pointer" onClick={showFolderSelect}>
-          Change Output Folder
-        </a>
-        {!!outputRoot && <p className="f5 tc i">Saving to: {outputRoot}</p>}
-      </div>
+      <a className="grow f5 ph4 underline dark-blue pointer mb3 mt3" onClick={addPDF}>
+        Add a PDF
+      </a>
+      <a className="grow f5 ph4 underline dark-blue pointer" onClick={showFolderSelect}>
+        {outputRoot ? 'Change' : 'Add an'} output folder
+      </a>
+      {!!outputRoot && <p className="f7 tc i mt1">Saving to: {outputRoot}</p>}
     </div>
   )
 }
 
 function PDFCard({ path, removePDF }) {
   return (
-    <div className="w-20 flex flex-column items-center mh2 tc mw-12rem">
-      <p className="f3 mh1 mv1 link self-end pointer dim" onClick={() => removePDF(path)}>
+    <div className="pdf w-20 flex flex-column items-center mh2 tc mw-12rem">
+      <p className="f4 mh1 mv1 link self-end pointer dim" onClick={() => removePDF(path)}>
         X
       </p>
       <div
@@ -329,7 +325,7 @@ function TableHeader({ labels }) {
     <thead>
       <tr className="striped--near-white bb bw2">
         {labels.map((label, idx) => (
-          <th className="pv3 ph2 tl f6 fw6 ttu" key={`${label}+${idx}`}>
+          <th className="pv3 ph2 tl f7 fw6 ttu" key={`${label}+${idx}`}>
             {label}
           </th>
         ))}
@@ -367,12 +363,13 @@ function createOutputFolder(root, salesperson, customer) {
 }
 
 let tid
-function debounce(fn, ms) {
-  return function(...args) {
+function debounceFilter(fn, ms) {
+  return function (event) {
+    const value = event.target.value.toLowerCase()
     clearTimeout(tid)
     tid = setTimeout(() => {
       clearTimeout(tid)
-      fn(...args)
+      fn(value)
     }, ms)
   }
 }
