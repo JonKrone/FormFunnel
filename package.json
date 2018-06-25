@@ -1,5 +1,6 @@
 {
   "name": "FormFunnel",
+  "productName": "Form Funnel",
   "version": "0.0.4",
   "description": "Fill forms with Google Sheets data",
   "main": "src/App/index.js",
@@ -29,9 +30,7 @@
     "eslint-config-airbnb": "^15",
     "eslint-plugin-import": "^2",
     "eslint-plugin-jsx-a11y": "^5",
-    "eslint-plugin-react": "^7",
-    "husky": "^0.14.3",
-    "pretty-quick": "^1.6.0"
+    "eslint-plugin-react": "^7"
   },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.1",
@@ -72,7 +71,8 @@
         "packageManager": "yarn"
       },
       "electronWinstallerConfig": {
-        "name": "formfunnel"
+        "name": "formfunnel",
+        "asar": true
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
