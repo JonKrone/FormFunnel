@@ -51,12 +51,14 @@ export default class App extends React.Component {
     this.removePDF = this.removePDF.bind(this)
     this.showFolderSelect = this.showFolderSelect.bind(this)
     this.filterRows = this.filterRows.bind(this)
+    this.dbLog = debounce(log, 1000)
   }
 
   componentWillMount() {
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
       rows.reverse() // most-recent first
+      rows = rows.slice(0, 50)
       this.setState({ isLoading: false, labels, data: rows, rows })
     })
   }
@@ -131,7 +133,7 @@ export default class App extends React.Component {
   addPDF() {
     log({
       type: 'add-pdf',
-      action: 'open',
+      action: 'open'
     })
     dialog.showOpenDialog(
       {
@@ -213,7 +215,8 @@ export default class App extends React.Component {
     this.setState({
       rows,
     })
-    log({
+
+    this.dbLog({
       type: 'filter-rows'
     })
   }
@@ -361,4 +364,15 @@ function TableRows({ rows, selectedRow, selectRow }) {
 
 function createOutputFolder(root, salesperson, customer) {
   return join(root, salesperson, customer)
+}
+
+let tid
+function debounce(fn, ms) {
+  return function(...args) {
+    clearTimeout(tid)
+    tid = setTimeout(() => {
+      clearTimeout(tid)
+      fn(...args)
+    }, ms)
+  }
 }

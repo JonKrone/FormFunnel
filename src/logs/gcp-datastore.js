@@ -21,13 +21,7 @@ module.exports = function createLoger(store) {
   initLogs(store)
   initSession(store, sessionId)
 
-  const addLog = (payload) => {
-    if (typeof payload === 'string') {
-      payload = {
-        message: payload,
-      }
-    }
-
+  function log(payload) {
     if (typeof payload !== 'object') {
       throw new Error('You log must be an Object')
     }
@@ -45,8 +39,7 @@ module.exports = function createLoger(store) {
     store.set(localStoreKey, oldLogs.concat([payload]))
   }
 
-  log.error = payload => addLog(Object.assign(payload, { type: 'error' }))
-  log.event = payload => addLog(Object.assign(payload, { type: 'event' }))
+  log.error = payload => log(Object.assign(payload, { type: 'error' }))
 
   log.flush = function flushLogs() {
     const now = Date.now()
@@ -65,8 +58,7 @@ module.exports = function createLoger(store) {
 
     datastore
       .save(logs)
-      .then((response) => {
-        console.log('GCP responded', response)
+      .then(() => {
         const nextLogs = store.get('logs')
         store.set('logs', nextLogs.filter(nextLog => nextLog.created > now))
         log('Uploaded previous logs')
@@ -78,16 +70,6 @@ module.exports = function createLoger(store) {
   }
 
   return log
-
-  function log(payload) {
-    if (typeof payload === 'string') {
-      payload = {
-        message: payload,
-      }
-    }
-
-    return addLog(Object.assign(payload, { type: 'info' }))
-  }
 }
 
 function initSession(store, sessionId) {
