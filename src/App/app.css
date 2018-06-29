@@ -61,3 +61,28 @@ body {
   width: 100vw;
   height: 100vh;
 }
+
+#App {
+  /* Disable text selection, or your app will feel like a web page */
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+
+  /* Cover the whole window */
+  height: 100%;
+
+  /* Make sure this matches the native window background color that you pass to
+   * electron.BrowserWindow({...}), otherwise your app startup will look janky. */
+  background: rgba(0, 0, 0, 0);
+
+  /* Smoother startup */
+  animation: fadein 0.5s;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

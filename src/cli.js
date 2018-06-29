@@ -1,22 +1,24 @@
-const yargs = require('yargs');
-const { fillPDFs } = require('./index');
-const path = require('path');
-const { green } = require('chalk');
+const yargs = require('yargs')
+const { fillPDFs } = require('./index')
+const path = require('path')
+const { green } = require('chalk')
 
-const { listFields } = require('./validate-form');
-const loadFromGSheets = require('./GoogleSheets/load-from-gsheets');
+const { listFields } = require('./validate-form')
+const { loadFromGSheets } = require('./GoogleSheets/load-from-gsheets')
 
 yargs
-  .usage('pdfFiller: Your handy dandy tool to fill a bunch of PDFs with CSV data!')
+  .usage(
+    'pdfFiller: Your handy dandy tool to fill a bunch of PDFs with CSV data!'
+  )
   .command({
     command: 'listFields <pdfPath>',
     description: 'List the names of fields in a PDF',
     handler({ pdfPath }) {
-      listFields(pdfPath).then((fields) => {
-        console.log(green('\nPDF:\t'), path.basename(pdfPath));
-        console.log(green('Fields:'));
-        fields.forEach(({ title }) => console.log('\t', title));
-      });
+      listFields(pdfPath).then(fields => {
+        console.log(green('\nPDF:\t'), path.basename(pdfPath))
+        console.log(green('Fields:'))
+        fields.forEach(({ title }) => console.log('\t', title))
+      })
     },
   })
   .command({
@@ -30,7 +32,7 @@ yargs
       },
     },
     handler({ clientID }) {
-      loadFromGSheets(clientID);
+      loadFromGSheets(clientID)
     },
   })
   .command({
@@ -65,4 +67,4 @@ yargs
     },
     handler: fillPDFs,
   })
-  .demandCommand(1, 'Must provide a command').argv;
+  .demandCommand(1, 'Must provide a command').argv
