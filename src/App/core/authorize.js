@@ -3,10 +3,8 @@ const { promisify } = require('util')
 const readline = require('readline')
 const { google } = require('googleapis')
 
-const loadCSVFromGSheets = require('./load-from-gsheets')
-
 // Load client secrets from a local file.
-const credentials = require('./../../client_secret.json')
+const credentials = require('./../../../client_secret.json')
 
 // If modifying these scopes, delete credentials.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -43,13 +41,13 @@ function authorize(callback) {
 function getNewToken(oAuth2Client, callback) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
-    scope: SCOPES
+    scope: SCOPES,
   })
 
   console.log('Authorize this app by visiting this url:', authUrl)
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   })
 
   rl.question('Enter the code from that page here: ', code => {
@@ -68,5 +66,5 @@ function getNewToken(oAuth2Client, callback) {
 }
 
 module.exports = {
-  authorize: promisify(authorize)
+  authorize: promisify(authorize),
 }

@@ -2,6 +2,7 @@ const uuid = require('uuid/v4')
 const Datastore = require('@google-cloud/datastore')
 
 const defaultLogs = []
+let logger
 
 // Creates a client
 const datastore = new Datastore({
@@ -9,14 +10,11 @@ const datastore = new Datastore({
   projectId: 'sheets-to-pdf',
 })
 
-// 1. store all logs of a session in `store`
-// 2. send all logs from the previous session at the beginning of the next session
-// 3. on success, remove previous session's logs (by timestamp?)
+// TODO: store and submit logs grouped by 'session-id'
 module.exports = function createLoger(store) {
   const sessionId = uuid()
   const logKey = 'logs'
 
-  initLogs(store)
   initSession(store, sessionId)
 
   function log(payload) {
@@ -65,10 +63,12 @@ module.exports = function createLoger(store) {
       })
   }
 
+  logger = log
   return log
 }
 
 function initSession(store, sessionId) {
+  // Hard-coded users for now. Leaving room to make it dynamic later.
   const isProd = process.env.NODE_ENV === 'production'
   const user = isProd ? 'david' : 'dev'
   const userKey = datastore.key(['User', user])
@@ -76,7 +76,7 @@ function initSession(store, sessionId) {
   return datastore.get(userKey).then(([entity]) => {
     const lastSessionId = entity.sessions[entity.sessions.length - 1]
     return Promise.all([
-      !!lastSessionId && storeLastLogsWithSession(store, lastSessionId),
+      !!lastSessionId && storeSession(store, lastSessionId),
       datastore.update(
         Object.assign(entity, {
           sessions: (entity.sessions || []).concat([sessionId]),
@@ -86,17 +86,12 @@ function initSession(store, sessionId) {
   })
 }
 
-function storeLastLogsWithSession(store, sessionId) {
+function storeSession(store, sessionId) {
   const logs = store.get('logs')
   if (logs.length <= 0) return Promise.resolve()
-  store.set('oldLogs', logs)
   store.set('logs', defaultLogs)
 
   const sessionKey = datastore.key(['Session', sessionId])
-  const sessionEntry = {
-    key: sessionKey,
-  }
-
   const session = {
     key: sessionKey,
     data: {
@@ -108,21 +103,24 @@ function storeLastLogsWithSession(store, sessionId) {
     .get(sessionKey)
     .then(([sesh]) => {
       if (sesh) {
-        sessionEntry.data.logs = sesh.logs.concat(logs)
+        // updating a session
+        session.data.logs = sesh.logs.concat(logs)
       }
       return datastore.upsert(session)
     })
-    .catch(err => {
+    .catch(error => {
       console.warn(
-        "Failed to submit last session's logs. Resetting oldLogs to:",
+        "Failed to submit last session's logs. Resetting logs to:",
         logs
       )
       store.set('logs', logs)
-      store.delete('oldLogs')
-      throw err
-    })
-}
+      if (logger) {
+        logger({
+          type: 'save-session',
+          error,
+        })
+      }
 
-function initLogs(store) {
-  if (!store.get('logs')) store.set('logs', defaultLogs)
+      throw error
+    })
 }
