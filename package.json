@@ -20,6 +20,8 @@
     "lint": "eslint --cache --color --ext .jsx,.js src"
   },
   "devDependencies": {
+    "babel-plugin-dynamic-import-node": "^2.0.0",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-async-to-generator": "^6.24.1",
     "babel-plugin-transform-es2015-classes": "^6.24.1",
     "babel-preset-env": "^1.7.0",
@@ -68,11 +70,11 @@
         ]
       },
       "electronPackagerConfig": {
-        "packageManager": "yarn"
+        "packageManager": false,
+        "asar": true
       },
       "electronWinstallerConfig": {
-        "name": "formfunnel",
-        "asar": true
+        "name": "FormFunnel"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
@@ -81,8 +83,8 @@
         "name": ""
       },
       "windowsStoreConfig": {
-        "packageName": "",
-        "name": "formfunnel"
+        "packageName": "FormFunnel",
+        "name": "FormFunnel"
       }
     }
   }

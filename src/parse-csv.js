@@ -33,10 +33,10 @@ async function parseCSV(path) {
 
   return {
     labels: Object.values(labelMap),
-    data: labeledRows
+    data: labeledRows,
   }
 }
 
 module.exports = {
-  parseCSV
+  parseCSV,
 }

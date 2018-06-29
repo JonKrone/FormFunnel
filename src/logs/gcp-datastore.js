@@ -1,6 +1,4 @@
 const uuid = require('uuid/v4')
-const { curry } = require('ramda')
-// Imports the Google Cloud client library
 const Datastore = require('@google-cloud/datastore')
 
 const defaultLogs = []
@@ -16,27 +14,25 @@ const datastore = new Datastore({
 // 3. on success, remove previous session's logs (by timestamp?)
 module.exports = function createLoger(store) {
   const sessionId = uuid()
-  const localStoreKey = 'logs'
+  const logKey = 'logs'
 
   initLogs(store)
   initSession(store, sessionId)
 
   function log(payload) {
     if (typeof payload !== 'object') {
-      throw new Error('You log must be an Object')
+      throw new Error('You may only log Objects')
     }
 
     if (!payload.type) {
       throw new Error('A log must have a type!')
     }
 
-    if (!('created' in payload)) {
-      payload.created = Date.now()
-    }
-
+    payload.created = Date.now()
     payload.sessionId = sessionId
-    const oldLogs = store.get(localStoreKey) || []
-    store.set(localStoreKey, oldLogs.concat([payload]))
+
+    const oldLogs = store.get(logKey) || []
+    store.set(logKey, oldLogs.concat([payload]))
   }
 
   log.error = payload => log(Object.assign(payload, { type: 'error' }))
@@ -63,7 +59,7 @@ module.exports = function createLoger(store) {
         store.set('logs', nextLogs.filter(nextLog => nextLog.created > now))
         log('Uploaded previous logs')
       })
-      .catch((error) => {
+      .catch(error => {
         console.error('Oh man, looks like GCP had an error uploading logs')
         throw error
       })
@@ -84,7 +80,7 @@ function initSession(store, sessionId) {
       datastore.update(
         Object.assign(entity, {
           sessions: (entity.sessions || []).concat([sessionId]),
-        }),
+        })
       ),
     ])
   })
@@ -116,8 +112,11 @@ function storeLastLogsWithSession(store, sessionId) {
       }
       return datastore.upsert(session)
     })
-    .catch((err) => {
-      console.warn('Resetting oldLogs to:', logs)
+    .catch(err => {
+      console.warn(
+        "Failed to submit last session's logs. Resetting oldLogs to:",
+        logs
+      )
       store.set('logs', logs)
       store.delete('oldLogs')
       throw err

@@ -1,36 +1,34 @@
-import React from 'react';
+const React = require('react')
 
-export default class ErrorBoundary extends React.Component {
+module.exports = class ErrorBoundary extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = { hasError: false, errors: [] };
-    this.removeError = this.removeError.bind(this);
+    super(props)
+    this.state = { hasError: false, errors: [] }
+    this.removeError = this.removeError.bind(this)
   }
 
-  componentDidCatch(error, info) {
-    console.log('caught error:', error)
-    let errIdx;
+  componentDidCatch(error) {
+    let errIdx
     this.setState(
       state => {
-        errIdx = state.errors.length;
-        return { errors: state.errors.concat([error]) };
+        errIdx = state.errors.length
+        return { errors: state.errors.concat([error]) }
       },
       () => {
         // Automatically remove the error after 15 seconds
-        setTimeout(removeError.bind(null, erridx), 15000);
-      },
-    );
-    // logErrorToMyService(error, info);
+        setTimeout(this.removeError.bind(null, errIdx), 15000)
+      }
+    )
   }
 
   removeError(idx) {
     this.setState(state => ({
-      errors: errors.filter((err, i) => i !== idx),
-    }));
+      errors: state.errors.filter((err, i) => i !== idx),
+    }))
   }
 
   render() {
-    const haveErrors = this.state.errors.length > 0;
+    const haveErrors = this.state.errors.length > 0
 
     if (!haveErrors) return this.props.children
 
@@ -40,16 +38,16 @@ export default class ErrorBoundary extends React.Component {
           <div className="error-zone">
             <h1>Whoops, we got an error!</h1>
             <ul>
-              {this.state.errors.map((err, idx) => {
-                <li onClick={this.removeError(idx)}>
+              {this.state.errors.map((err, idx) => (
+                <li onClick={() => this.removeError(idx)}>
                   {err.message}
                   {err.stack}
-                </li>;
-              })}
+                </li>
+              ))}
             </ul>
           </div>
         )}
       </React.Fragment>
-    );
+    )
   }
 }
