@@ -15,9 +15,8 @@ module.exports = function ActionPanel({
   const hasPDFs = !!selectedPDFs.length
   return (
     <div className="w-third action-panel">
-      <section className="pv3" />
       {hasPDFs && (
-        <div className="pdf-list w-100 flex flex-wrap justify-around mv4">
+        <div className="pdf-list w-100 mb2 flex flex-wrap justify-around">
           {selectedPDFs.map(path => (
             <PDFCard path={path} key={path} removePDF={removePDF} />
           ))}
@@ -58,10 +57,10 @@ module.exports = function ActionPanel({
 
 function PDFCard({ path, removePDF }) {
   const name = parse(path).name
-  const cutoff = 50
+  const cutoff = 30
   const prettyPath = name.length > cutoff ? `${name.slice(0, cutoff)}...` : name
   return (
-    <div className="pdf w-50 flex flex-column items-center mh2 tc mw-12rem">
+    <div className="pdf w-45 flex flex-column items-center mh2 tc mw-12rem">
       <a
         className="f4 mr4 mv1 link self-end pointer dim"
         onClick={() => removePDF(path)}
@@ -79,7 +78,9 @@ function PDFCard({ path, removePDF }) {
           src="../assets/pdf.svg"
           alt="pdf icon"
         />
-        <a className="mt3 f6 dark-blue fw6">{prettyPath}</a>
+        <span className="pdf-title mt3 f6 fw6 dark-blue mw-6rem">
+          {prettyPath}
+        </span>
       </div>
     </div>
   )

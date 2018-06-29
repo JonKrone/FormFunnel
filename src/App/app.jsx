@@ -1,6 +1,6 @@
 const React = require('react')
 const { join } = require('path')
-const { shell, remote } = require('electron')
+const { shell, remote, webFrame } = require('electron')
 const unhandled = require('electron-unhandled')
 
 const { loadFromGSheets, labelRows } = require('./core/load-from-gsheets')
@@ -13,8 +13,6 @@ const ActionPanel = require('./components/ActionPanel')
 
 const { dialog, getCurrentWindow } = remote
 const log = createLogger(store)
-window.log = log
-window.store = store
 
 unhandled({
   logger: error => {
@@ -24,6 +22,9 @@ unhandled({
     })
   },
 })
+
+// Shhh. (simpler than changing base font/everything sizes)
+webFrame.setZoomFactor(0.9)
 
 export default class App extends React.Component {
   constructor(props) {
@@ -237,6 +238,7 @@ export default class App extends React.Component {
   }
 
   filterRows(value) {
+    // This is a bit naive and expensive. Should migrate to a worker
     const data = this.state.data
     const rows = data.filter(
       row => !!row.find(col => col.toLowerCase().includes(value))
