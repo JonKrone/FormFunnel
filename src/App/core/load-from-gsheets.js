@@ -1,7 +1,7 @@
 const { promisify } = require('util')
 const { google } = require('googleapis')
 
-const secrets = require('./../../secrets')
+const secrets = require('./../../../secrets')
 const { authorize } = require('./authorize')
 
 const sheets = google.sheets('v4')

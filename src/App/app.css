@@ -1,3 +1,18 @@
+#App {
+  /* Disable text selection, or the app feels like a web page */
+  -webkit-user-select: none;
+  /* -webkit-app-region: drag; */
+
+  /* Cover the whole window */
+  height: 100%;
+
+  /* Match the native window bg color passed to the main BrowserWindow */
+  background: #f4f4f4;
+
+  /* Smoother startup */
+  animation: fadein 0.5s;
+}
+
 body {
   font-size: 0.75rem;
 }
@@ -9,6 +24,10 @@ body {
 
 .sheets-table {
   overflow: scroll;
+}
+
+.sheets-table__header {
+  background-color: hsla(0, 0%, 100%, 0.2);
 }
 
 .sheets-table__row:hover {
@@ -23,6 +42,8 @@ body {
 .pdf-list {
   height: 100%;
   align-items: center;
+  max-height: 60vh;
+  overflow: auto;
 }
 
 .pdf {
@@ -36,8 +57,12 @@ body {
   align-items: center;
 }
 
-.striped--near-white:nth-child(even) {
+.striped:nth-child(odd) {
   background-color: white;
+}
+
+.striped:nth-child(even) {
+  background-color: hsla(0, 0%, 100%, 0.2);
 }
 
 .disabled {
@@ -60,22 +85,6 @@ body {
 .isLoading {
   width: 100vw;
   height: 100vh;
-}
-
-#App {
-  /* Disable text selection, or your app will feel like a web page */
-  -webkit-user-select: none;
-  -webkit-app-region: drag;
-
-  /* Cover the whole window */
-  height: 100%;
-
-  /* Make sure this matches the native window background color that you pass to
-   * electron.BrowserWindow({...}), otherwise your app startup will look janky. */
-  background: rgba(0, 0, 0, 0);
-
-  /* Smoother startup */
-  animation: fadein 0.5s;
 }
 
 @keyframes fadein {

@@ -18,7 +18,8 @@ const createWindow = async () => {
     minWidth: 1200,
     minHeight: 450,
     autoHideMenuBar: true,
-    // frame: false,
+    backgroundColor: '#f4f4f4',
+    acceptFirstMouse: true,
   })
 
   // and load the index.html of the app.

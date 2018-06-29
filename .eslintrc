@@ -6,9 +6,10 @@
     "import/no-unresolved": [2, { "ignore": ["electron"] }],
     "linebreak-style": 0,
     "react/prefer-stateless-function": 0,
-    "no-unused-vars": ["error", { varsIgnorePattern: "_" }],
+    "no-unused-vars": ["error", { "varsIgnorePattern": "_" }],
     "semi": 0,
     "no-param-reassign": 0,
-    "no-use-before-define": ["error", { functions: false }]
+    "no-use-before-define": ["error", { "functions": false }],
+    "react/prop-types": 0
   }
 }

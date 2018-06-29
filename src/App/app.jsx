@@ -1,18 +1,15 @@
 const React = require('react')
-const cn = require('classnames')
-const { parse, join } = require('path')
+const { join } = require('path')
 const { shell, remote } = require('electron')
 const unhandled = require('electron-unhandled')
-const { Scrollbars } = require('react-custom-scrollbars')
 
-const {
-  loadFromGSheets,
-  labelRows,
-} = require('./../GoogleSheets/load-from-gsheets')
+const { loadFromGSheets, labelRows } = require('./core/load-from-gsheets')
 const { fillPDFs } = require('./../fill-form')
-const store = require('./store')
-const createLogger = require('./../logs/gcp-datastore')
-const ErrorBoundary = require('./ErrorBoundary')
+const store = require('./core/store')
+const createLogger = require('./core/logger')
+const ErrorBoundary = require('./components/ErrorBoundary')
+const DataTable = require('./components/DataTable')
+const ActionPanel = require('./components/ActionPanel')
 
 const { dialog, getCurrentWindow } = remote
 const log = createLogger(store)
@@ -84,9 +81,7 @@ export default class App extends React.Component {
     }
 
     if (!this.state.outputRoot) {
-      const win = getCurrentWindow()
-      dialog.showMessageBox(win, {
-        type: 'info',
+      displayModal({
         title: 'Where should we save the PDFs?',
         message:
           "Please use the 'Add an output folder' button to select the root folder where we'll place the PDFs.\n\nFor example: C/Users/David will place files in C/Users/David/<salesperson>/<customer>",
@@ -95,17 +90,14 @@ export default class App extends React.Component {
     }
 
     const pdfs = this.state.selectedPDFs
-    const data = [this.state.selectedRow]
-    const labeledData = labelRows(this.state.labels, data)[0]
-    const outputFolder = join(
-      this.state.outputRoot,
-      labeledData.Salesperson,
-      labeledData['Customer Name']
-    )
+    const labeledData = labelRows(this.state.labels, [this.state.selectedRow])
+    const client = labeledData[0]
+    const customerPath = join(client.Salesperson, client['Customer Name'])
+    const outputFolder = join(this.state.outputRoot, customerPath)
 
     fillPDFs({
       pdfPaths: pdfs,
-      data: [labeledData],
+      data: labeledData,
       outputFolder,
       quiet: true,
     })
@@ -123,8 +115,20 @@ export default class App extends React.Component {
           done: true,
         })
 
-        if (err.message.match(/spawn pdftk ENOENT/)) {
-          showMissingPdftkMessage()
+        if (err.message.match(/does not exist/)) {
+          displayModal({
+            message: `Create the folder for ${customerPath}`,
+          })
+          return
+        } else if (err.message.match(/spawn pdftk ENOENT/)) {
+          displayModal({
+            title: 'Please install pdftk',
+            buttons: ['Beam me up'],
+            message:
+              "Hey, looks like this is your first time using me. To work, I need a tool called PDFtk server, a little command-line app that I use internally.\n\nAfter clicking the button below, use the BIG GREEN 'Windows Download' button to download the software, then go ahead and install it.\n\nPromise it's not malicious.",
+          }).then(() => {
+            shell.openExternal('https://www.pdflabs.com/tools/pdftk-server/')
+          })
           return
         }
         throw err
@@ -203,7 +207,7 @@ export default class App extends React.Component {
 
     log({
       type: 'remove-pdf',
-      utility: utility,
+      utility,
     })
   }
 
@@ -226,7 +230,7 @@ export default class App extends React.Component {
         store.set('outputRoot', folder[0])
         log({
           type: 'output-folder',
-          action: 'close',
+          action: 'select',
         })
       }
     )
@@ -265,27 +269,13 @@ export default class App extends React.Component {
     return (
       <ErrorBoundary>
         <div className="mt2 flex flex-row">
-          <div className="w-two-thirds flex-column items-baseline">
-            <input
-              className="mv2 mh3 pv2 ph3 ba br2"
-              type="text"
-              placeholder="Filter"
-              onChange={this.filterRows}
-              autoFocus
-            />
-            <div className="sheets-table__cont pr3 br2 overflow-auto">
-              <Scrollbars>
-                <table className="sheets-table mh3 collapse ba b--black-10">
-                  <TableHeader labels={labels} />
-                  <TableRows
-                    rows={rows}
-                    selectedRow={selectedRow}
-                    selectRow={this.selectRow}
-                  />
-                </table>
-              </Scrollbars>
-            </div>
-          </div>
+          <DataTable
+            labels={labels}
+            rows={rows}
+            selectedRow={selectedRow}
+            selectRow={this.selectRow}
+            filterRows={this.filterRows}
+          />
           <ActionPanel
             selectedPDFs={selectedPDFs}
             outputRoot={outputRoot}
@@ -301,127 +291,9 @@ export default class App extends React.Component {
   }
 }
 
-function ActionPanel({
-  readyToFill,
-  selectedPDFs,
-  addPDF,
-  showFolderSelect,
-  removePDF,
-  fillEm,
-  outputRoot,
-}) {
-  const hasPDFs = !!selectedPDFs.length
-  return (
-    <div className="w-third action-panel">
-      {hasPDFs && (
-        <div className="pdf-list w-100 flex flex-wrap justify-around mv4">
-          {selectedPDFs.map(path => (
-            <PDFCard path={path} key={path} removePDF={removePDF} />
-          ))}
-        </div>
-      )}
-      <button
-        type="button"
-        className={cn(
-          {
-            disabled: !readyToFill,
-            pointer: readyToFill,
-            pv3: !hasPDFs,
-            'pt3 pb4': hasPDFs,
-          },
-          'f1 ph4 mv4 mb4 link br3 dib white bg-dark-blue'
-        )}
-        disabled={!readyToFill}
-        onClick={fillEm}
-      >
-        Fill 'em!
-      </button>
-      <a
-        className="grow f5 ph4 underline dark-blue pointer mb3 mt3"
-        onClick={addPDF}
-      >
-        Add a PDF
-      </a>
-      <a
-        className="grow f5 ph4 underline dark-blue pointer"
-        onClick={showFolderSelect}
-      >
-        {outputRoot ? 'Change' : 'Add an'} output folder
-      </a>
-      {!!outputRoot && <p className="f7 tc i mt1">Saving to: {outputRoot}</p>}
-    </div>
-  )
-}
-
-function PDFCard({ path, removePDF }) {
-  const name = parse(path).name
-  const prettyPath = name.length > 20 ? `${name.slice(0, 20)}...` : name
-  return (
-    <div className="pdf w-20 flex flex-column items-center mh2 tc mw-12rem">
-      <a
-        className="f4 mh1 mv1 link self-end pointer dim"
-        onClick={() => removePDF(path)}
-      >
-        X
-      </a>
-      <div
-        className="flex flex-column items-center dim pointer"
-        onClick={() => shell.openItem(path)}
-      >
-        <img
-          className=""
-          width="100px"
-          height="100px"
-          src="../assets/pdf.svg"
-          alt="pdf icon"
-        />
-        <a className="mt3 dark-blue fw6">{prettyPath}</a>
-      </div>
-    </div>
-  )
-}
-
-function TableHeader({ labels }) {
-  return (
-    <thead>
-      <tr className="striped--near-white bb bw2">
-        {labels.map((label, idx) => (
-          <th className="pv3 ph2 tl f7 fw6 ttu" key={`${label}+${idx}`}>
-            {label}
-          </th>
-        ))}
-      </tr>
-    </thead>
-  )
-}
-
-// TODO BUG: selectRow(idx) needs to select the idx of `data`, not `rows`
-function TableRows({ rows, selectedRow, selectRow }) {
-  return (
-    <tbody>
-      {rows.map((row, idx) => (
-        <tr
-          className={cn(
-            { 'sheets-table__row--selected': selectedRow[0] === row[0] },
-            'sheets-table__row striped--near-white mv1'
-          )}
-          onClick={() => selectRow(idx)}
-          key={`${row[0]}${idx}`}
-        >
-          {row.map((col, i) => (
-            <td className="ph2 pv2" key={`${col}${i}`}>
-              {col}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  )
-}
-
 let tid
 function debounceFilter(fn, ms) {
-  return function(event) {
+  return function bouncer(event) {
     const value = event.target.value.toLowerCase()
     clearTimeout(tid)
     tid = setTimeout(() => {
@@ -431,21 +303,19 @@ function debounceFilter(fn, ms) {
   }
 }
 
-function showMissingPdftkMessage() {
+function displayModal(options) {
   const win = getCurrentWindow()
 
-  dialog.showMessageBox(
-    win,
-    {
-      type: 'info',
-      buttons: ['Beam me up'],
-      title: 'Please install pdftk',
-      message:
-        'Hey, looks like this is your first time using me. To work, I need a tool called PDFtk server, a little command-line app that I use internally.\n\n' +
-        "After clicking the button below, use the BIG GREEN 'Windows Download' button to download the software, then go ahead and install it.\n\nPromise it's not malicious.",
-    },
-    () => {
-      shell.openExternal('https://www.pdflabs.com/tools/pdftk-server/')
-    }
-  )
+  return new Promise(resolve => {
+    dialog.showMessageBox(
+      win,
+      Object.assign(
+        {
+          type: 'info',
+        },
+        options
+      ),
+      resolve
+    )
+  })
 }
