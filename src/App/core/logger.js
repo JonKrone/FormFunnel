@@ -1,17 +1,22 @@
-const uuid = require('uuid/v4')
-const Datastore = require('@google-cloud/datastore')
+import uuid from 'uuid/v4'
+import Datastore from '@google-cloud/datastore'
 
 const defaultLogs = []
 let logger
 
+const isDev = process.env.NODE_ENV !== 'production'
+!isDev && console.log('production!')
+
 // Creates a client
 const datastore = new Datastore({
-  keyFilename: 'Sheets to PDF-c352f25c1508.json',
+  keyFilename: isDev
+    ? 'secrets/Sheets to PDF-c352f25c1508.json'
+    : 'resources/app/secrets/Sheets to PDF-c352f25c1508.json',
   projectId: 'sheets-to-pdf',
 })
 
 // TODO: store and submit logs grouped by 'session-id'
-module.exports = function createLoger(store) {
+export default function createLoger(store) {
   const sessionId = uuid()
   const logKey = 'logs'
 

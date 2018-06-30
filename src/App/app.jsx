@@ -1,15 +1,15 @@
-const React = require('react')
-const { join } = require('path')
-const { shell, remote, webFrame } = require('electron')
-const unhandled = require('electron-unhandled')
+import React from 'react'
+import { join } from 'path'
+import { shell, remote, webFrame } from 'electron'
+import unhandled from 'electron-unhandled'
 
-const { loadFromGSheets, labelRows } = require('./core/load-from-gsheets')
-const { fillPDFs } = require('./../fill-form')
-const store = require('./core/store')
-const createLogger = require('./core/logger')
-const ErrorBoundary = require('./components/ErrorBoundary')
-const DataTable = require('./components/DataTable')
-const ActionPanel = require('./components/ActionPanel')
+import { loadFromGSheets, labelRows } from './core/load-from-gsheets'
+import { fillPDFs } from './../fill-form'
+import store from './core/store'
+import createLogger from './core/logger'
+import ErrorBoundary from './components/ErrorBoundary'
+import DataTable from './components/DataTable'
+import ActionPanel from './components/ActionPanel'
 
 const { dialog, getCurrentWindow } = remote
 const log = createLogger(store)

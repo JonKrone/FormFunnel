@@ -1,14 +1,14 @@
-const path = require('path')
-const fs = require('fs')
-const { promisify } = require('util')
-const { curry } = require('ramda')
-const pdf = require('pdffiller')
-const chalk = require('chalk')
+import path from 'path'
+import fs from 'fs'
+import { promisify } from 'util'
+import { curry } from 'ramda'
+import pdf from 'pdffiller'
+import chalk from 'chalk'
+
+import { parseCSV } from './parse-csv'
 
 const fill = promisify(pdf.fillFormWithFlatten).bind(pdf)
 const mkdir = promisify(fs.mkdir)
-
-const { parseCSV } = require('./parse-csv')
 
 // How many of the last path.sep separated paths to include in the output path
 const RELATIVE_OUTPUT_PATH_PART = -3
@@ -97,7 +97,7 @@ async function ensureFolderExists(folderPath) {
   })
 }
 
-module.exports = {
+export default {
   fillPDF: curry(fillPDF),
   fillPDFs,
   fillFromCSV,

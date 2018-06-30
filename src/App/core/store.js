@@ -1,6 +1,6 @@
-const Store = require('electron-store')
-const defaults = require('./default-config')
+import Store from 'electron-store'
+import defaults from './default-config'
 
 const store = new Store({ defaults })
 
-module.exports = store
+export default store

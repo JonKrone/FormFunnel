@@ -1,8 +1,8 @@
-const React = require('react')
-const cn = require('classnames')
-const { Scrollbars } = require('react-custom-scrollbars')
+import React from 'react'
+import cn from 'classnames'
+import { Scrollbars } from 'react-custom-scrollbars'
 
-module.exports = function DataTable({
+export default function DataTable({
   labels,
   rows,
   selectedRow,
