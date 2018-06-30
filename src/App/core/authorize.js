@@ -4,14 +4,15 @@ import { parse } from 'url'
 import { google } from 'googleapis'
 
 import electron from 'electron'
-import { resolve, join } from 'path'
+import { join } from 'path'
 
 // Load client secrets from a local file.
 import clientSecrets from './../../../secrets/client_secret.json'
+import { appDataPath } from './util'
 
 // If modifying these scopes, delete clientSecrets.json.
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 const TOKEN_PATH = join(appDataPath(), 'credentials.json')
+const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -100,9 +101,4 @@ function getNewToken(oAuth2Client, callback) {
       }
     }
   }
-}
-
-function appDataPath() {
-  const savePath = (electron.remote || electron).app.getPath('userData')
-  return resolve(`${savePath}/extensions`)
 }

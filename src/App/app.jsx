@@ -31,9 +31,11 @@ export default class App extends React.Component {
     super(props)
     this.state = {
       isLoading: true,
+
       labels: [],
       data: [],
       rows: [],
+
       selectedRow: [],
       selectedPDFs: [],
       outputRoot: store.get('outputRoot'),
@@ -123,7 +125,6 @@ export default class App extends React.Component {
           return
         } else if (err.message.match(/spawn pdftk ENOENT/)) {
           displayModal({
-            title: 'Please install pdftk',
             buttons: ['Beam me up'],
             message:
               "Hey, looks like this is your first time using me. To work, I need a tool called PDFtk server, a little command-line app that I use internally.\n\nAfter clicking the button below, use the BIG GREEN 'Windows Download' button to download the software, then go ahead and install it.\n\nPromise it's not malicious.",

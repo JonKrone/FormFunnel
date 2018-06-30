@@ -1,7 +1,6 @@
 import path from 'path'
 import fs from 'fs'
 import { promisify } from 'util'
-import { curry } from 'ramda'
 import pdf from 'pdffiller'
 import chalk from 'chalk'
 
@@ -13,7 +12,7 @@ const mkdir = promisify(fs.mkdir)
 // How many of the last path.sep separated paths to include in the output path
 const RELATIVE_OUTPUT_PATH_PART = -3
 
-async function fillPDFs({ pdfPaths, outputFolder, quiet, data }) {
+export async function fillPDFs({ pdfPaths, outputFolder, quiet, data }) {
   if (!Array.isArray(pdfPaths)) {
     pdfPaths = [pdfPaths]
   }
@@ -49,7 +48,7 @@ async function fillPDFs({ pdfPaths, outputFolder, quiet, data }) {
   return Promise.all(formFills).then(() => filledForms)
 }
 
-async function fillFromCSV({ pdfPaths, csvPath, outputFolder, quiet }) {
+export async function fillFromCSV({ pdfPaths, csvPath, outputFolder, quiet }) {
   const { labels, data } = await parseCSV(csvPath)
   await fillPDFs({
     pdfPaths,
@@ -60,7 +59,7 @@ async function fillFromCSV({ pdfPaths, csvPath, outputFolder, quiet }) {
   })
 }
 
-function fillPDF(pdfPath, outputPath, data) {
+export function fillPDF(pdfPath, outputPath, data) {
   return fill(pdfPath, outputPath, data, false).catch(error => {
     if (error.message.match(/spawn pdftk ENOENT/)) {
       console.log('Looks like we dont have pdftk')
@@ -70,35 +69,9 @@ function fillPDF(pdfPath, outputPath, data) {
   })
 }
 
-/* eslint-disable no-unused-vars */
-function verifyDataHaveNametags(nametag, data) {
-  const tags = {}
-  return data.every(row => {
-    if (tags[row[nametag]]) {
-      throw new Error(
-        `There are two rows with the same nametag: ${tags[nametag]}`
-      )
-    }
-
-    if (nametag in row) {
-      tags[nametag] = row[nametag]
-      return true
-    }
-    throw new Error(
-      `There is a row without a nametag. row's data: ${Object.values(row)}`
-    )
-  })
-}
-
 async function ensureFolderExists(folderPath) {
   return mkdir(folderPath).catch(error => {
     if (error.code === 'EEXIST') return Promise.resolve()
     throw error
   })
-}
-
-export default {
-  fillPDF: curry(fillPDF),
-  fillPDFs,
-  fillFromCSV,
 }
