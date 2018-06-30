@@ -1,7 +1,7 @@
 {
   "name": "FormFunnel",
   "productName": "Form Funnel",
-  "version": "0.0.4",
+  "version": "0.0.9",
   "description": "Fill forms with Google Sheets data",
   "main": "src/App/index.js",
   "author": "Jonathan Krone <jonathankrone@gmail.com>",
