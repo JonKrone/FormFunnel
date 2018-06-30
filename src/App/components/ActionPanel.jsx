@@ -1,9 +1,9 @@
-const { parse } = require('path')
-const React = require('react')
-const { shell } = require('electron')
-const cn = require('classnames')
+import { parse } from 'path'
+import React from 'react'
+import { shell } from 'electron'
+import cn from 'classnames'
 
-module.exports = function ActionPanel({
+export default function ActionPanel({
   readyToFill,
   selectedPDFs,
   addPDF,

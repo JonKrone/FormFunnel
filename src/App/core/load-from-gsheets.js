@@ -1,17 +1,17 @@
-const { promisify } = require('util')
-const { google } = require('googleapis')
+import { promisify } from 'util'
+import { google } from 'googleapis'
 
-const secrets = require('./../../../secrets')
-const { authorize } = require('./authorize')
+import config from './../../../secrets/config'
+import authorize from './authorize'
 
 const sheets = google.sheets('v4')
 const getValues = promisify(sheets.spreadsheets.values.get).bind(sheets)
 
-async function loadFromGSheets() {
+export async function loadFromGSheets() {
   return authorize()
     .then(auth =>
       getValues({
-        spreadsheetId: secrets.sheets.indexSheetId,
+        spreadsheetId: config.sheets.indexSheetId,
         range: 'Index!A1:N2000',
         auth,
       })
@@ -22,7 +22,7 @@ async function loadFromGSheets() {
     })
 }
 
-async function loadClient(clientID) {
+export async function loadClient(clientID) {
   return loadFromGSheets().then(({ labels, rows }) => {
     const clientRow = rows.find(row => row[0] === String(clientID))
     return labelRows(labels, clientRow)
@@ -31,7 +31,7 @@ async function loadClient(clientID) {
 
 // // ['a', 'b'], [1, 2] => [['a', 1], ['b', 2]]
 // // [[label, value]]
-function labelRows(labels, rows) {
+export function labelRows(labels, rows) {
   if (!Array.isArray(rows[0])) rows = [rows]
   if (labels.length !== rows[0].length) {
     throw new Error('Cannot zip labels and rows with non-equal length')
@@ -51,10 +51,4 @@ function labelRows(labels, rows) {
       return client
     }, {})
   )
-}
-
-module.exports = {
-  loadFromGSheets,
-  loadClient,
-  labelRows,
 }

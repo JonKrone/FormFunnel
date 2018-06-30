@@ -1,5 +1,5 @@
-const { promisify } = require('util')
-const { generateFieldJson } = require('pdffiller')
+import { promisify } from 'util'
+import { generateFieldJson } from 'pdffiller'
 
 const generateFields = promisify(generateFieldJson)
 
@@ -25,7 +25,7 @@ function verifyFormHasFields(fields, labels) {
   })
 }
 
-module.exports = {
+export default {
   validateForm,
   listFields: pdfPath => generateFields(pdfPath, null),
 }

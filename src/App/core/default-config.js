@@ -1,4 +1,8 @@
-module.exports = {
+/**
+ * This config serves as a template and reference for local state we store
+ */
+
+export default {
   utilityToPDFs: {
     // AE: ['C:\\Projects\\professional\\FormFunnel\\test\\fixtures\\AE CAF 2018.pdf'],
   },

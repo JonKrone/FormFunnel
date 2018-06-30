@@ -1,7 +1,8 @@
-const fs = require('fs').promises
-const { resolve } = require('path')
-const { promisify } = require('util')
-const csv = promisify(require('csv-parse'))
+import { promises } from 'fs'
+import { resolve } from 'path'
+import csv from 'csv-parse'
+
+const fs = promises
 
 async function loadCSV(csvPath) {
   try {
@@ -14,7 +15,7 @@ async function loadCSV(csvPath) {
   }
 }
 
-async function parseCSV(path) {
+export async function parseCSV(path) {
   const [labels, ...rows] = await loadCSV(path)
 
   // { [idx]: 'label', ... }
@@ -35,8 +36,4 @@ async function parseCSV(path) {
     labels: Object.values(labelMap),
     data: labeledRows,
   }
-}
-
-module.exports = {
-  parseCSV,
 }
