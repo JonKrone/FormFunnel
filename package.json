@@ -19,6 +19,11 @@
     "publish": "electron-forge publish",
     "lint": "eslint --cache --color --ext .jsx,.js src"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint"
+    }
+  },
   "devDependencies": {
     "babel-plugin-dynamic-import-node": "^2.0.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
@@ -32,7 +37,8 @@
     "eslint-config-airbnb": "^15",
     "eslint-plugin-import": "^2",
     "eslint-plugin-jsx-a11y": "^5",
-    "eslint-plugin-react": "^7"
+    "eslint-plugin-react": "^7",
+    "husky": "^0.14.3"
   },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.1",
