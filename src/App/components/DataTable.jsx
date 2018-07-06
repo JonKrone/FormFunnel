@@ -16,7 +16,7 @@ export default function DataTable({
         type="text"
         placeholder="Filter"
         onChange={filterRows}
-        autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+        autoFocus
       />
       <div className="sheets-table__cont pr3 br2 overflow-auto">
         <Scrollbars>
