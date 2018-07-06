@@ -72,7 +72,7 @@ function PDFCard({ path, removePDF }) {
       <div
         className="flex flex-column items-center dim pointer"
         onClick={() => shell.openItem(path)}
-        role="presentation"
+        // role="presentation"
       >
         <img
           className=""
