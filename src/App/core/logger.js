@@ -5,7 +5,6 @@ const defaultLogs = []
 let logger
 
 const isDev = process.env.NODE_ENV !== 'production'
-!isDev && console.log('production!')
 
 // Creates a client
 const datastore = new Datastore({
@@ -86,7 +85,7 @@ function initSession(store, sessionId) {
         Object.assign(entity, {
           sessions: (entity.sessions || []).concat([sessionId]),
         })
-      ),
+      )
     ])
   })
 }

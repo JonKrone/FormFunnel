@@ -33,7 +33,7 @@ function auth(callback) {
     if (err) return getNewToken(oAuth2Client, callback)
     console.log('found tokens in:', TOKEN_PATH)
     oAuth2Client.setCredentials(JSON.parse(token))
-    callback(null, oAuth2Client)
+    return callback(null, oAuth2Client)
   })
 }
 
@@ -92,11 +92,11 @@ function getNewToken(oAuth2Client, callback) {
           if (err) return callback(err)
           oAuth2Client.setCredentials(token)
           // Store the token to disk for later program executions
-          fs.writeFile(TOKEN_PATH, JSON.stringify(token), err => {
-            if (err) console.error(err)
+          fs.writeFile(TOKEN_PATH, JSON.stringify(token), error => {
+            if (error) console.error(error)
             console.log('Token stored to', TOKEN_PATH)
           })
-          callback(null, oAuth2Client)
+          return callback(null, oAuth2Client)
         })
       }
     }

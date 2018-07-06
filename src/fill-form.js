@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import pdf from 'pdffiller'
 import chalk from 'chalk'
 
-import { parseCSV } from './parse-csv'
+import parseCSV from './parse-csv'
 
 const fill = promisify(pdf.fillFormWithFlatten).bind(pdf)
 const mkdir = promisify(fs.mkdir)

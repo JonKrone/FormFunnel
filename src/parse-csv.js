@@ -11,26 +11,26 @@ async function loadCSV(csvPath) {
   } catch (err) {
     console.error('Failed to load the CSV!')
     console.error(err)
-    process.exit(1)
+    return process.exit(1)
   }
 }
 
-export async function parseCSV(path) {
+export default async function parseCSV(path) {
   const [labels, ...rows] = await loadCSV(path)
 
   // { [idx]: 'label', ... }
-  const labelMap = labels.reduce((labels, label, idx) => {
-    labels[idx] = label
-    return labels
+  const labelMap = labels.reduce((map, label, idx) => {
+    map[idx] = label
+    return map
   }, {})
 
-  const labeledRows = rows.map(row => {
-    return row.reduce((acc, column, idx) => {
+  const labeledRows = rows.map(row =>
+    row.reduce((acc, column, idx) => {
       const colName = labelMap[idx]
       acc[colName] = column
       return acc
     }, {})
-  })
+  )
 
   return {
     labels: Object.values(labelMap),

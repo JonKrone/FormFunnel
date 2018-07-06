@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import electron from 'electron'
 import { resolve } from 'path'
 

@@ -28,8 +28,6 @@ export default function ActionPanel({
           {
             disabled: !readyToFill,
             pointer: readyToFill,
-            // pv3: !hasPDFs,
-            // 'pt3 pb3': hasPDFs,
           },
           'f1 ph4 pv3 mb2 link br3 dib white bg-dark-blue'
         )}
@@ -47,6 +45,8 @@ export default function ActionPanel({
       <a
         className="grow f5 ph4 underline dark-blue pointer"
         onClick={showFolderSelect}
+        role="button"
+        tabIndex={0}
       >
         {outputRoot ? 'Change' : 'Add an'} output folder
       </a>
@@ -64,12 +64,15 @@ function PDFCard({ path, removePDF }) {
       <a
         className="f4 mr4 mv1 link self-end pointer dim"
         onClick={() => removePDF(path)}
+        role="button"
+        tabIndex={0}
       >
         X
       </a>
       <div
         className="flex flex-column items-center dim pointer"
         onClick={() => shell.openItem(path)}
+        role="presentation"
       >
         <img
           className=""
