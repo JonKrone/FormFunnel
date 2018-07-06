@@ -6,6 +6,7 @@ const { green } = require('chalk')
 const { listFields } = require('./validate-form')
 const { loadFromGSheets } = require('./GoogleSheets/load-from-gsheets')
 
+/* eslint-disable no-unused-expressions */
 yargs
   .usage(
     'pdfFiller: Your handy dandy tool to fill a bunch of PDFs with CSV data!'

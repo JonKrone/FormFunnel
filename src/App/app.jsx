@@ -155,7 +155,7 @@ export default class App extends React.Component {
         title: 'Select fillable PDFs',
         filters: [
           { name: 'PDFs', extensions: ['pdf', 'fdf'] },
-          { name: 'All Files', extensions: ['*'] },
+          { name: 'All Files', extensions: ['*'] }
         ],
         properties: ['openFile', 'multiSelections'],
       },
@@ -263,11 +263,9 @@ export default class App extends React.Component {
       outputRoot,
     } = this.state
     if (isLoading) {
-      return (
-        <div className="loading-msg flex flex-column items-center justify-center f1">
-          Loading . . .
-        </div>
-      )
+      const loadingClasses =
+        'loading-msg flex flex-column items-center justify-center f1'
+      return <div className={loadingClasses}>Loading . . .</div>
     }
     return (
       <ErrorBoundary>

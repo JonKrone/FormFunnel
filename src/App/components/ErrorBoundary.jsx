@@ -39,9 +39,15 @@ export default class ErrorBoundary extends React.Component {
             <h1>Whoops, we got an error!</h1>
             <ul>
               {this.state.errors.map((err, idx) => (
-                <li onClick={() => this.removeError(idx)}>
-                  {err.message}
-                  {err.stack}
+                <li key={err.message + err.stack}>
+                  <a
+                    role="link"
+                    tabIndex={-1}
+                    onClick={() => this.removeError(idx)}
+                  >
+                    {err.message}
+                    {err.stack}
+                  </a>
                 </li>
               ))}
             </ul>
