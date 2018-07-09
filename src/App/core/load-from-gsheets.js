@@ -12,7 +12,7 @@ export async function loadFromGSheets() {
     .then(auth =>
       getValues({
         spreadsheetId: config.sheets.indexSheetId,
-        range: 'Index!A1:N2000',
+        range: 'Index!A:ZZ',
         auth,
       })
     )
