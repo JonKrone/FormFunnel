@@ -258,9 +258,6 @@ export default class App extends React.Component {
       rows,
     })
 
-    console.log('data2:', data)
-    console.log('filtered:', rows)
-
     log({
       type: 'filter-rows',
     })
@@ -282,8 +279,6 @@ export default class App extends React.Component {
         'loading-msg flex flex-column items-center justify-center f1'
       return <div className={loadingClasses}>Loading . . .</div>
     }
-
-    console.log('data:', data)
 
     return (
       <ErrorBoundary>
