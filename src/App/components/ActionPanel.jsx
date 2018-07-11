@@ -43,7 +43,7 @@ export default function ActionPanel({
         Add a PDF
       </button>
       <a
-        className="grow f5 ph4 underline dark-blue pointer"
+        className="f5 ph4 underline dark-blue pointer"
         onClick={showFolderSelect}
         role="button"
         tabIndex={0}
@@ -75,7 +75,6 @@ function PDFCard({ path, removePDF }) {
         // role="presentation"
       >
         <img
-          className=""
           width="100px"
           height="100px"
           src="../assets/pdf.svg"
