@@ -44,26 +44,16 @@ export default class App extends React.Component {
     this.fillEm = this.fillEm.bind(this)
     this.addPDF = this.addPDF.bind(this)
     this.removePDF = this.removePDF.bind(this)
-    this.refreshGSheets = this.refreshGSheets.bind(this)
     this.showFolderSelect = this.showFolderSelect.bind(this)
     this.filterRows = debounceFilter(this.filterRows.bind(this))
   }
 
   componentWillMount() {
-    this.refreshGSheets()
-  }
-
-  refreshGSheets() {
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
-
-      rows = rows.filter(row => row[0] !== '') // Google returns many empty rows
       rows.reverse() // most-recent first
-
       this.setState({ isLoading: false, labels, data: rows, rows })
     })
-
-    this.setState({ isLoading: true })
   }
 
   selectRow(selectedIdx) {
@@ -268,12 +258,10 @@ export default class App extends React.Component {
       isLoading,
       labels,
       rows,
-      data,
       selectedRow,
       selectedPDFs,
       outputRoot,
     } = this.state
-
     if (isLoading) {
       const loadingClasses =
         'loading-msg flex flex-column items-center justify-center f1'
@@ -286,11 +274,9 @@ export default class App extends React.Component {
           <DataTable
             labels={labels}
             rows={rows}
-            data={data}
             selectedRow={selectedRow}
             selectRow={this.selectRow}
             filterRows={this.filterRows}
-            refreshGSheets={this.refreshGSheets}
           />
           <ActionPanel
             selectedPDFs={selectedPDFs}
