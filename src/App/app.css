@@ -22,24 +22,28 @@ body {
   width: 100vw;
 }
 
-.sheets-table {
+.table {
   overflow: scroll;
 }
 
-.sheets-table__header {
+.table__header {
   background-color: hsla(0, 0%, 100%, 0.2);
 }
 
-.sheets-table__row:hover {
+.table__row:hover {
   background-color: lightblue !important;
   cursor: pointer;
 }
 
-.sheets-table tr.sheets-table__row--selected {
+.hovered-row {
+  background-color: lightblue !important;
+}
+
+.table tr.table__row--selected {
   background-color: lightblue;
 }
 
-.sheets-table__actions {
+.table-actions {
   max-height: 50px;
 }
 
@@ -87,7 +91,7 @@ body {
   overflow: auto;
 }
 
-.sheets-table__cont {
+.table__cont {
   height: 92vh;
 }
 
@@ -173,10 +177,8 @@ body {
   text-align: center;
 }
 
-.letter-cell {
-  font-size: 1.5em;
-  color: #fff;
-  text-align: center;
+.striped-cell {
+
 }
 
 .no-content-cell {
