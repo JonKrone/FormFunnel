@@ -45,15 +45,25 @@ export default class App extends React.Component {
     this.addPDF = this.addPDF.bind(this)
     this.removePDF = this.removePDF.bind(this)
     this.showFolderSelect = this.showFolderSelect.bind(this)
+    this.refreshData = this.refreshData.bind(this)
     this.filterRows = debounceFilter(this.filterRows.bind(this))
   }
 
   componentWillMount() {
+    this.refreshData()
+  }
+
+  refreshData() {
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
+
+      rows = rows.filter(row => row[0] !== '') // only data-filled rows
       rows.reverse() // most-recent first
+
       this.setState({ isLoading: false, labels, data: rows, rows })
     })
+
+    this.setState({ isLoading: true })
   }
 
   selectRow(selectedIdx) {
@@ -277,6 +287,7 @@ export default class App extends React.Component {
             selectedRow={selectedRow}
             selectRow={this.selectRow}
             filterRows={this.filterRows}
+            refreshData={this.refreshData}
           />
           <ActionPanel
             selectedPDFs={selectedPDFs}
