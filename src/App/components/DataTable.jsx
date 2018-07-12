@@ -51,7 +51,7 @@ export default function DataTable({
 function TableHeader({ labels }) {
   return (
     <thead>
-      <tr className="table__header bb bw2">
+      <tr className="table-header bb bw2">
         {labels.map((label, idx) => (
           <th className="pv3 pl2 pr4 tl f7 fw6 ttu" key={`${label}+${idx}`}>
             {label}
@@ -62,24 +62,37 @@ function TableHeader({ labels }) {
   )
 }
 
+class TableRow extends React.PureComponent {
+  render() {
+    const { isSelected, selectRow, row, idx } = this.props
+
+    return <tr
+      className={cn(
+        { 'table__row--selected': isSelected },
+        'table__row striped mv1'
+      )}
+      onClick={() => selectRow(idx)}
+    >
+      {row.map((col, i) => (
+        <td className="ph2 pv2" key={`${col}${i}`}>
+          {col}
+        </td>
+      ))}
+    </tr>
+  }
+}
+
 function TableRows({ rows, selectedRow, selectRow }) {
   return (
     <tbody>
       {rows.map((row, idx) => (
-        <tr
-          className={cn(
-            { 'table__row--selected': selectedRow[0] === row[0] },
-            'table__row striped mv1'
-          )}
-          onClick={() => selectRow(idx)}
+        <TableRow
           key={`${row[0]}${idx}`}
-        >
-          {row.map((col, i) => (
-            <td className="ph2 pv2" key={`${col}${i}`}>
-              {col}
-            </td>
-          ))}
-        </tr>
+          isSelected={selectedRow[0] === row[0]}
+          selectRow={selectRow}
+          row={row}
+          idx={idx}
+        />
       ))}
     </tbody>
   )
