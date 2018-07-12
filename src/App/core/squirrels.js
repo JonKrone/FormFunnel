@@ -18,7 +18,7 @@ export default function handleSquirrelEvent() {
 
   const appFolder = path.resolve(process.execPath, '..')
   const rootAtomFolder = path.resolve(appFolder, '..')
-  const squirrel = path.resolve(path.join(rootAtomFolder, 'Update.exe'))
+  const squirrelExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'))
   const exeName = path.basename(process.execPath)
 
   const squirrelEvent = process.argv[1]
@@ -31,7 +31,7 @@ export default function handleSquirrelEvent() {
       //   explorer context menus
 
       // Install desktop and start menu shortcuts
-      spawn(squirrel, ['--createShortcut', exeName])
+      spawn(squirrelExe, ['--createShortcut', exeName])
 
       setTimeout(app.quit, 1000)
       return true
@@ -40,7 +40,7 @@ export default function handleSquirrelEvent() {
       // --squirrel-updated handlers
 
       // Remove desktop and start menu shortcuts
-      spawn(['--removeShortcut', exeName])
+      spawn(squirrelExe, ['--removeShortcut', exeName])
 
       setTimeout(app.quit, 1000)
       return true

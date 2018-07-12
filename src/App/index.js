@@ -7,7 +7,7 @@ import { enableLiveReload } from 'electron-compile'
 import unhandled from 'electron-unhandled'
 import log from 'electron-log'
 
-import handleSquirrelEvents from './core/squirrel'
+import handleSquirrelEvents from './core/squirrels'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.

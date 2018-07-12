@@ -45,7 +45,6 @@ export default class DataTable extends React.PureComponent {
               />
             </table>
           </Scrollbars>
-
         </div>
       </div>
     )
@@ -56,11 +55,17 @@ function TableHeader({ labels }) {
   return (
     <thead>
       <tr className="table-header bb bw2">
-        {labels.map((label, idx) => (
-          <th className="pv3 pl2 pr4 tl f7 fw6 ttu" key={`${label}+${idx}`}>
-            {label}
-          </th>
-        ))}
+        {labels.map((label, idx) => {
+          const cutoff = 18
+          const prettyLabel =
+            label.length > cutoff ? `${label.slice(0, cutoff)}...` : label
+
+          return (
+            <th className="pv3 pl2 pr4 tl f7 fw6 ttu" key={`${label}+${idx}`}>
+              {prettyLabel}
+            </th>
+          )
+        })}
       </tr>
     </thead>
   )
@@ -86,18 +91,20 @@ class TableRow extends React.PureComponent {
   render() {
     const { isSelected, selectRow, row, idx } = this.props
 
-    return <tr
-      className={cn(
-        { 'table__row--selected': isSelected },
-        'table__row striped mv1'
-      )}
-      onClick={() => selectRow(idx)}
-    >
-      {row.map((col, i) => (
-        <td className="ph2 pv2" key={`${col}${i}`}>
-          {col}
-        </td>
-      ))}
-    </tr>
+    return (
+      <tr
+        className={cn(
+          { 'table__row--selected': isSelected },
+          'table__row striped mv1'
+        )}
+        onClick={() => selectRow(idx)}
+      >
+        {row.map((col, i) => (
+          <td className="ph2 pv2" key={`${col}${i}`}>
+            {col}
+          </td>
+        ))}
+      </tr>
+    )
   }
 }
