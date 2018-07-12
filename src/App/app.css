@@ -26,17 +26,13 @@ body {
   overflow: scroll;
 }
 
-.table__header {
+.table-header {
   background-color: hsla(0, 0%, 100%, 0.2);
 }
 
 .table__row:hover {
   background-color: lightblue !important;
   cursor: pointer;
-}
-
-.hovered-row {
-  background-color: lightblue !important;
 }
 
 .table tr.table__row--selected {
