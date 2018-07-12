@@ -2,50 +2,54 @@ import React from 'react'
 import cn from 'classnames'
 import { Scrollbars } from 'react-custom-scrollbars'
 
-export default function DataTable({
-  labels,
-  rows,
-  selectedRow,
-  selectRow,
-  filterRows,
-  refreshData
-}) {
-  return (
-    <div className="w-two-thirds flex-column items-baseline">
-      <div className="flex table-actions">
-        <input
-          className="mv2 mh3 pv2 ph3 ba br2"
-          type="text"
-          placeholder="Filter"
-          onChange={filterRows}
-          autoFocus // eslint-disable-line jsx-a11y/no-autofocus
-        />
-        <button
-          className="pointer inline-flex ma2 ba br2"
-          onClick={refreshData}
-        >
-          <img
-            className="refresh-icon"
-            src="../assets/refresh.svg"
-            alt="refresh icon"
-          />
-        </button>
-      </div>
-      <div className="table__cont pr3 br2 overflow-auto">
-        <Scrollbars>
-          <table className="table mh3 collapse ba b--black-10">
-            <TableHeader labels={labels} />
-            <TableRows
-              rows={rows}
-              selectedRow={selectedRow}
-              selectRow={selectRow}
-            />
-          </table>
-        </Scrollbars>
+export default class DataTable extends React.PureComponent {
+  render() {
+    const {
+      labels,
+      rows,
+      selectedRow,
+      selectRow,
+      filterRows,
+      refreshData
+    } = this.props
 
+    return (
+      <div className="w-two-thirds flex-column items-baseline">
+        <div className="flex table-actions">
+          <input
+            className="mv2 mh3 pv2 ph3 ba br2"
+            type="text"
+            placeholder="Filter"
+            onChange={filterRows}
+            autoFocus // eslint-disable-line jsx-a11y/no-autofocus
+          />
+          <button
+            className="pointer inline-flex ma2 ba br2"
+            onClick={refreshData}
+          >
+            <img
+              className="refresh-icon"
+              src="../assets/reload-2.svg"
+              alt="refresh icon"
+            />
+          </button>
+        </div>
+        <div className="table__cont pr3 br2 overflow-auto">
+          <Scrollbars>
+            <table className="table mh3 collapse ba b--black-10">
+              <TableHeader labels={labels} />
+              <TableRows
+                rows={rows}
+                selectedRow={selectedRow}
+                selectRow={selectRow}
+              />
+            </table>
+          </Scrollbars>
+
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 function TableHeader({ labels }) {
