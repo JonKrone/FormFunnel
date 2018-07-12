@@ -61,7 +61,7 @@ function TableHeader({ labels }) {
             label.length > cutoff ? `${label.slice(0, cutoff)}...` : label
 
           return (
-            <th className="pv3 pl2 pr4 tl f7 fw6 ttu" key={`${label}+${idx}`}>
+            <th className="pv2 pl2 pr4 tl f7 fw6 ttu" key={`${label}+${idx}`}>
               {prettyLabel}
             </th>
           )
