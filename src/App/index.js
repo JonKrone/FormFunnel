@@ -7,6 +7,8 @@ import { enableLiveReload } from 'electron-compile'
 import unhandled from 'electron-unhandled'
 import log from 'electron-log'
 
+import handleSquirrelEvents from './core/squirrel'
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
@@ -22,6 +24,11 @@ unhandled({
 })
 
 const createWindow = async () => {
+  // Pass off labor if we're being installed/updated/uninstalled
+  if (handleSquirrelEvents()) {
+    return
+  }
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1000,
