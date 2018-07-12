@@ -62,6 +62,22 @@ function TableHeader({ labels }) {
   )
 }
 
+function TableRows({ rows, selectedRow, selectRow }) {
+  return (
+    <tbody>
+      {rows.map((row, idx) => (
+        <TableRow
+          key={`${row[0]}${idx}`}
+          isSelected={selectedRow[0] === row[0]}
+          selectRow={selectRow}
+          row={row}
+          idx={idx}
+        />
+      ))}
+    </tbody>
+  )
+}
+
 class TableRow extends React.PureComponent {
   render() {
     const { isSelected, selectRow, row, idx } = this.props
@@ -80,20 +96,4 @@ class TableRow extends React.PureComponent {
       ))}
     </tr>
   }
-}
-
-function TableRows({ rows, selectedRow, selectRow }) {
-  return (
-    <tbody>
-      {rows.map((row, idx) => (
-        <TableRow
-          key={`${row[0]}${idx}`}
-          isSelected={selectedRow[0] === row[0]}
-          selectRow={selectRow}
-          row={row}
-          idx={idx}
-        />
-      ))}
-    </tbody>
-  )
 }

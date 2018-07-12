@@ -4,7 +4,7 @@ import { shell, remote, webFrame } from 'electron'
 import unhandled from 'electron-unhandled'
 
 import { loadFromGSheets, labelRows } from './core/load-from-gsheets'
-import { fillPDFs } from './../fill-form'
+import { fillPDFs } from './core/fill-form'
 import store from './core/store'
 import createLogger from './core/logger'
 import ErrorBoundary from './components/ErrorBoundary'
