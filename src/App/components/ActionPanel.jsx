@@ -29,7 +29,7 @@ export default function ActionPanel({
             disabled: !readyToFill,
             pointer: readyToFill,
           },
-          'f1 ph4 pv3 mb2 link br3 dib white bg-dark-blue'
+          'fill-em f1 ph4 pv3 mb2 link br3 dib white bg-dark-blue'
         )}
         disabled={!readyToFill}
         onClick={fillEm}
@@ -37,19 +37,19 @@ export default function ActionPanel({
         {"Fill 'em!"}
       </button>
       <button
-        className="f5 pv2 ph2 pointer mb4 mt2 br3 white bg-dark-blue"
+        className="f5 pv2 ph2 pointer inline-flex mb4 mt2 ba br3"
         onClick={addPDF}
       >
         Add a PDF
       </button>
-      <a
-        className="grow f5 ph4 underline dark-blue pointer"
+      <button
+        className="f5 ph3 pv1 pointer ba br3"
         onClick={showFolderSelect}
         role="button"
         tabIndex={0}
       >
         {outputRoot ? 'Change' : 'Add an'} output folder
-      </a>
+      </button>
       {!!outputRoot && <p className="f7 tc i mt1">Saving to: {outputRoot}</p>}
     </div>
   )

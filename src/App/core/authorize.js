@@ -31,9 +31,11 @@ function auth(callback) {
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) => {
     if (err) return getNewToken(oAuth2Client, callback)
+
     console.log('found tokens in:', TOKEN_PATH)
     oAuth2Client.setCredentials(JSON.parse(token))
-    return callback(null, oAuth2Client)
+    callback(null, oAuth2Client)
+    throw new Error(`found tokens in: ${TOKEN_PATH}`)
   })
 }
 
@@ -95,6 +97,7 @@ function getNewToken(oAuth2Client, callback) {
           fs.writeFile(TOKEN_PATH, JSON.stringify(token), error => {
             if (error) console.error(error)
             console.log('Token stored to', TOKEN_PATH)
+            throw new Error(`Stored tokens in: ${TOKEN_PATH}`)
           })
           return callback(null, oAuth2Client)
         })
