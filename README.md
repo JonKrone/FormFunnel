@@ -2,31 +2,38 @@
 
 > A simple, specialized electron app for quickly filling out common Form-fillable PDFs.
 
-Built for a specific use-case, this form filler saves time when you've got groups of forms that are commonly used with different data.
+This form filler saves time when you've got a bunch of form-fillable PDFs that you frequently fill from data elsewhere in your system.
 
-As an example: for each house built in a township, someone at a construction company typically fills out a bunch of forms for various utilities, HOAs, certification forms, internal documents, etc. With this app, you can just put that data in a Google Sheet, connect this app with that sheet, select the PDFs and press `Fill 'em` to complete the forms.
+We remember form selections based on certain column data to make your next use easier.
 
-This app uses a column's label to find the field in the PDF to fill.
-
-<img>
+#### **Example**
+>For each house built in a township, someone at a construction company typically fills out a bunch of forms for various utilities, HOAs, certifications, internal documents, etc.
+>
+>With this app you just load that data via Google Sheets, xls, or csv then add your PDFs and press `Fill 'em` to complete the forms.
 
 <hr>
-Functionality:
+
+## **Functionality**
 
 - Link a Google Sheets document
-- Select and save form-fillable PDFs (FDFs)
+- Select form-fillable PDFs (FDFs)
+- Save form selection based on a specific column
 - Fill those PDFs with selected rows from the Google Sheet
-- Locally remember all selections so that future use is much faster
+- Remember all selections so that future use is much faster
 
-There you have it!
-
-I collect crash and usage information so that I can find bugs and improve the UX.
+I collect crash and usage information to find bugs and improve the UX.
 
 <hr>
-## Future updates . . .
 
-- Refined UX
-- Ability to import data from files
-- Load and fill PDFs from many sheets / datasets
-- Allow grouping PDFs by column entry to a sheet
-  - This would enable using an index sheet to control multiple form-group fillings
+## Future
+
+- More flexible data sourcing
+  - Specify a Google Sheet
+  - Excel
+  - CSV
+- Easier connection between data and a form's fields
+  - A 'Form Creator' UI where you can map columns to a PDF's fields
+  - A UI for displaying a form's fieldIDs
+- Enable setting a scheme to remember form selections
+- Enable customizing the output folder patterns
+- Continuously refine UI/UX
