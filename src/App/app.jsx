@@ -1,10 +1,10 @@
-import React from '../../../../../Users/krone/AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/react'
+import React from 'react'
 import { join } from 'path'
 import { shell, remote, webFrame } from 'electron'
 import unhandled from 'electron-unhandled'
 
 import { loadFromGSheets, labelRows } from './core/loaders/gsheets-load'
-import { fillPDFs } from './core/pdf/fill-form
+import { fillPDFs } from './core/pdf/fill-form'
 import store from './core/store/store'
 import createLogger from './core/log/logger'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -54,6 +54,7 @@ export default class App extends React.Component {
   }
 
   refreshData() {
+    require('./core/pdf/get-fields')
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
 

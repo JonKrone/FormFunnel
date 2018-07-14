@@ -7146,7 +7146,7 @@ utf8-byte-length@^1.0.1:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/utf8-byte-length/-/utf8-byte-length-1.0.4.tgz#f45f150c4c66eee968186505ab93fcbb8ad6bf61"
 
-utf8-fdf-generator@0.0.3:
+utf8-fdf-generator@0.0.3, utf8-fdf-generator@^0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/utf8-fdf-generator/-/utf8-fdf-generator-0.0.3.tgz#397e8f7940c276d0e3d435ec27b17d3a57e8f9ce"
   dependencies:
