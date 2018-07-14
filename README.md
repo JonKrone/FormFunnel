@@ -7,9 +7,10 @@ This form filler saves time when you've got a bunch of form-fillable PDFs that y
 We remember form selections based on certain column data to make your next use easier.
 
 #### **Example**
->For each house built in a township, someone at a construction company typically fills out a bunch of forms for various utilities, HOAs, certifications, internal documents, etc.
+
+> For each house built in a township, someone at a construction company typically fills out a bunch of forms for various utilities, HOAs, certifications, internal documents, etc.
 >
->With this app you just load that data via Google Sheets, xls, or csv then add your PDFs and press `Fill 'em` to complete the forms.
+> With this app you just load that data via Google Sheets, xls, or csv then add your PDFs and press `Fill 'em` to complete the forms.
 
 <hr>
 
@@ -27,6 +28,7 @@ I collect crash and usage information to find bugs and improve the UX.
 
 ## Future
 
+- Continuously refine UI/UX
 - More flexible data sourcing
   - Specify a Google Sheet
   - Excel
@@ -36,4 +38,4 @@ I collect crash and usage information to find bugs and improve the UX.
   - A UI for displaying a form's fieldIDs
 - Enable setting a scheme to remember form selections
 - Enable customizing the output folder patterns
-- Continuously refine UI/UX
+- If output dir doesn't exist, offer to create it
