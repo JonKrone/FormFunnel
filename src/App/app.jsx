@@ -1,12 +1,12 @@
-import React from 'react'
+import React from '../../../../../Users/krone/AppData/Local/Microsoft/TypeScript/2.9/node_modules/@types/react'
 import { join } from 'path'
 import { shell, remote, webFrame } from 'electron'
 import unhandled from 'electron-unhandled'
 
-import { loadFromGSheets, labelRows } from './core/load-from-gsheets'
-import { fillPDFs } from './core/fill-form'
-import store from './core/store'
-import createLogger from './core/logger'
+import { loadFromGSheets, labelRows } from './core/loaders/gsheets-load'
+import { fillPDFs } from './core/pdf/fill-form
+import store from './core/store/store'
+import createLogger from './core/log/logger'
 import ErrorBoundary from './components/ErrorBoundary'
 import DataTable from './components/DataTable'
 import ActionPanel from './components/ActionPanel'
@@ -34,7 +34,7 @@ export default class App extends React.Component {
 
       labels: [],
       data: [],
-      rows: [],
+      filteredRows: [],
 
       selectedRow: [],
       selectedPDFs: [],
@@ -60,14 +60,19 @@ export default class App extends React.Component {
       rows = rows.filter(row => row[0] !== '') // only data-filled rows
       rows.reverse() // most-recent first
 
-      this.setState({ isLoading: false, labels, data: rows, rows })
+      this.setState({
+        data: rows,
+        filteredRows: rows,
+        isLoading: false,
+        labels,
+      })
     })
 
     this.setState({ isLoading: true })
   }
 
   selectRow(selectedIdx) {
-    const rowData = this.state.rows[selectedIdx]
+    const rowData = this.state.filteredRows[selectedIdx]
     const isDeselecting = this.state.selectedRow === rowData
     const selectedRow = isDeselecting ? [] : rowData
     const utility = selectedRow[3]
@@ -130,7 +135,7 @@ export default class App extends React.Component {
 
         if (err.message.match(/does not exist/)) {
           displayModal({
-            message: `Create the folder for ${customerPath}`,
+            message: `Looks like the folder "${customerPath}" does not exist. Please create it :)`,
           })
           return
         } else if (err.message.match(/spawn pdftk ENOENT/)) {
@@ -251,11 +256,11 @@ export default class App extends React.Component {
   filterRows(value) {
     // This is a bit naive and expensive. Should migrate to a worker
     const data = this.state.data
-    const rows = data.filter(
+    const filteredRows = data.filter(
       row => !!row.find(col => col.toLowerCase().includes(value))
     )
     this.setState({
-      rows,
+      filteredRows,
     })
 
     log({
@@ -267,7 +272,7 @@ export default class App extends React.Component {
     const {
       isLoading,
       labels,
-      rows,
+      filteredRows,
       selectedRow,
       selectedPDFs,
       outputRoot,
@@ -283,7 +288,7 @@ export default class App extends React.Component {
         <div className="mt2 flex flex-row">
           <DataTable
             labels={labels}
-            rows={rows}
+            rows={filteredRows}
             selectedRow={selectedRow}
             selectRow={this.selectRow}
             filterRows={this.filterRows}

@@ -1,7 +1,7 @@
 import { promisify } from 'util'
 import { google } from 'googleapis'
 
-import config from './../../../../secrets/config'
+import config from '../../../../secrets/config'
 import authorize from './gsheets-authorize'
 
 const sheets = google.sheets('v4')

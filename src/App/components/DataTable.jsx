@@ -10,7 +10,7 @@ export default class DataTable extends React.PureComponent {
       selectedRow,
       selectRow,
       filterRows,
-      refreshData
+      refreshData,
     } = this.props
 
     return (
@@ -90,7 +90,6 @@ function TableRows({ rows, selectedRow, selectRow }) {
 class TableRow extends React.PureComponent {
   render() {
     const { isSelected, selectRow, row, idx } = this.props
-
     return (
       <tr
         className={cn(
