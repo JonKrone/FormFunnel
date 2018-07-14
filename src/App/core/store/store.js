@@ -1,5 +1,5 @@
 import Store from 'electron-store'
-import defaults from './default-config'
+import defaults from '../util/default-config'
 
 const store = new Store({ defaults })
 

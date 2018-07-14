@@ -1,5 +1,4 @@
 import { app, BrowserWindow } from 'electron'
-
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer'
@@ -7,8 +6,8 @@ import { enableLiveReload } from 'electron-compile'
 import unhandled from 'electron-unhandled'
 import log from 'electron-log'
 
-import handleSquirrelEvents from './core/squirrels'
-import './core/node-version-check'
+import handleSquirrelEvents from './core/util/squirrels'
+import './core/util/node-version-check'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
