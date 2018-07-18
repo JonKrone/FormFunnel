@@ -10,8 +10,7 @@ This app uses a column's label to find the field in the PDF to fill.
 
 <img>
 
-<hr>
-Functionality:
+## Functionality:
 
 - Link a Google Sheets document
 - Select and save form-fillable PDFs (FDFs)
@@ -22,7 +21,6 @@ There you have it!
 
 I collect crash and usage information so that I can find bugs and improve the UX.
 
-<hr>
 ## Future updates . . .
 
 - Refined UX
