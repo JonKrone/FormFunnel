@@ -2,19 +2,15 @@
 
 > A simple, specialized electron app for quickly filling out common Form-fillable PDFs.
 
-This form filler saves time when you've got a bunch of form-fillable PDFs that you frequently fill from data elsewhere in your system.
-
-We remember form selections based on certain column data to make your next use easier.
+We speed up your form filling by bringing data and forms right next to each other and keeping track of which forms you use for which data.
 
 #### **Example**
 
 > For each house built in a township, someone at a construction company typically fills out a bunch of forms for various utilities, HOAs, certifications, internal documents, etc.
 >
-> With this app you just load that data via Google Sheets, xls, or csv then add your PDFs and press `Fill 'em` to complete the forms.
+> With this app you just load that data via Google Sheets, Excel, or CSV then add your PDFs and press `Fill 'em` to complete the forms.
 
-<hr>
-
-## **Functionality**
+## Functionality:
 
 - Link a Google Sheets document
 - Select form-fillable PDFs (FDFs)
@@ -24,9 +20,7 @@ We remember form selections based on certain column data to make your next use e
 
 I collect crash and usage information to find bugs and improve the UX.
 
-<hr>
-
-## Future
+## Future updates:
 
 - Continuously refine UI/UX
 - More flexible data sourcing
@@ -36,6 +30,6 @@ I collect crash and usage information to find bugs and improve the UX.
 - Easier connection between data and a form's fields
   - A 'Form Creator' UI where you can map columns to a PDF's fields
   - A UI for displaying a form's fieldIDs
-- Enable setting a scheme to remember form selections
-- Enable customizing the output folder patterns
+- Allow setting a strategy to remember form selections
+- Allow customizing the output folder patterns
 - If output dir doesn't exist, offer to create it
