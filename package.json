@@ -1,11 +1,14 @@
 {
   "name": "FormFunnel",
   "productName": "Form Funnel",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Fill forms with Google Sheets data",
   "main": "src/App/index.js",
   "author": "Jonathan Krone <jonathankrone@gmail.com>",
   "license": "ISC",
+  "repository": {
+    "url": "https://github.com/JonKrone/FormFunnel"
+  },
   "directories": {
     "test": "test",
     "src": "src"
@@ -62,6 +65,7 @@
     "react-dom": "^16.4.1",
     "react-hot-loader": "^3.0.0-beta.6",
     "tachyons": "^4.10.0",
+    "update-electron-app": "^1.3.0",
     "utf8-fdf-generator": "^0.0.3",
     "uuid": "^3.2.1"
   },
