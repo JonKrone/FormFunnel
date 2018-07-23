@@ -54,7 +54,6 @@ export default class App extends React.Component {
   }
 
   refreshData() {
-    require('./core/pdf/get-fields')
     loadFromGSheets().then(({ labels, rows }) => {
       log({ type: 'gsheet-load' })
 

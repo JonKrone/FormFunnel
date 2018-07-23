@@ -16,51 +16,10 @@ import pdf from 'pdffiller'
  *  - ?
  *
  *
- *
- *
  * pdftk does not support changing the dropdown
  */
 
 export default function getFields(pdfPath) {
   console.log('pm:', promisify(pdf.generateFieldJson))
   return promisify(pdf.generateFieldJson)(pdfPath, null)
-  // return new Promise((res, rej) => {
-  //   pdf.generateFieldJson(
-  //     pdfPath,
-  //     null,
-  //     (data, err) => (err ? rej(err) : res(data))
-  //   )
-  // })
 }
-
-// getFields(
-//   'C:/Projects/professional/FormFunnel/test/fixtures/dropdown-test.pdf'
-// ).then(data => {
-//   console.log('fieldData:', data)
-// })
-
-// const generator = require('utf8-fdf-generator').generator
-
-// generator(
-//   {
-//     myField01: 'Gabriel Medina',
-//     myField02: 'Ciudad Juárez, Chihuahua, México',
-//   },
-//   'output.fdf'
-// )
-
-pdf.fillFormWithFlatten(
-  'C:/Projects/professional/FormFunnel/test/fixtures/dropdown-test.pdf',
-  'C:/Projects/professional/FormFunnel/test/fixtures/test-out.pdf',
-  {
-    title: 'Dropdown-field',
-    fieldType: 'Choice',
-    fieldValue: 'column 1',
-    // fieldOpt: ['done1', 'done2'],
-  },
-  false,
-  (err, data) => {
-    console.log('wrote')
-    if (err) throw err
-  }
-)
