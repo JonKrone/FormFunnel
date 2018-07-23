@@ -6,8 +6,6 @@ import { enableLiveReload } from 'electron-compile'
 import unhandled from 'electron-unhandled'
 import log from 'electron-log'
 
-import './core/util/pre-start'
-
 import handleSquirrelEvents from './core/util/squirrels'
 import './core/util/node-version-check'
 
