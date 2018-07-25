@@ -2,7 +2,7 @@
 
 > A simple, specialized electron app for quickly filling out common Form-fillable PDFs.
 
-We speed up your form filling by bringing data and forms right next to each other and keeping track of which forms you use for which data.
+We speed up your form filling by bringing data and forms together in one view and trying to be smart about which forms you want to fill.
 
 #### **Example**
 
@@ -22,6 +22,7 @@ I collect crash and usage information to find bugs and improve the UX.
 
 ## Future updates:
 
+- Automatic updates
 - Continuously refine UI/UX
 - More flexible data sourcing
   - Specify a Google Sheet
