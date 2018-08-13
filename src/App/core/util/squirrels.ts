@@ -57,14 +57,11 @@ export default function handleSquirrelEvent() {
   return false
 }
 
-function spawn(command, args) {
-  let spawnedProcess
+function spawn(command: string, args: string[]): void {
   try {
-    spawnedProcess = ChildProcess.spawn(command, args, { detached: true })
+    ChildProcess.spawn(command, args, { detached: true })
   } catch (error) {
     console.error('Failed to handle a squirrel event:', command, args)
     console.error(error)
   }
-
-  return spawnedProcess
 }

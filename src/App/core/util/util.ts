@@ -2,7 +2,7 @@
 import electron from 'electron'
 import { resolve } from 'path'
 
-export function appDataPath() {
-  const savePath = (electron.remote || electron).app.getPath('userData')
+export function appDataPath(): string {
+  const savePath: string = (electron.remote || electron).app.getPath('userData')
   return resolve(savePath)
 }

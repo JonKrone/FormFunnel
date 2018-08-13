@@ -8,7 +8,7 @@ import { join } from 'path'
 
 // Load client secrets from a local file.
 import clientSecrets from './../../../../secrets/client_secret.json'
-import { appDataPath } from './../util/util'
+import { appDataPath } from '../util/util'
 
 // If modifying these scopes, delete clientSecrets.json.
 const TOKEN_PATH = join(appDataPath(), 'credentials.json')
