@@ -1,5 +1,5 @@
 import { promisify } from 'util'
-import pdf from 'pdffiller'
+import { generateFieldJson } from 'pdffiller'
 
 /**
  * Notes
@@ -19,7 +19,20 @@ import pdf from 'pdffiller'
  * pdftk does not support changing the dropdown
  */
 
-export default function getFields(pdfPath) {
-  console.log('pm:', promisify(pdf.generateFieldJson))
-  return promisify(pdf.generateFieldJson)(pdfPath, null)
+export default function getFields(pdfPath: string): Promise<Field[]> {
+  // console.log('pm:', promisify(pdf.generateFieldJson))
+  return promisify(generateFieldJson)(pdfPath, null)
+}
+
+// getFields(
+//   'C:/Projects/professional/FormFunnel/test/fixtures/AEP Texas Interconnection Application.pdf'
+// ).then(data => {
+//   console.log('data:', data)
+// })
+
+interface Field {
+  title: string
+  fieldType: string // is an enum in reality
+  fieldValue: string
+  fieldFlags: string // is an enum in reality
 }
