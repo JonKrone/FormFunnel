@@ -108,7 +108,7 @@ export default class App extends React.Component {
     }
 
     const pdfs = this.state.selectedPDFs
-    const labeledData = labelRows(this.state.labels, [this.state.selectedRow])
+    const labeledData = labelRows(this.state.labels, this.state.selectedRow)
     const client = labeledData[0]
     const customerPath = join(client.Salesperson, client['Customer Name'])
     const outputFolder = join(this.state.outputRoot, customerPath)

@@ -1,8 +1,26 @@
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import cn from 'classnames'
-import { Scrollbars } from 'react-custom-scrollbars'
+import Scrollbars from 'react-custom-scrollbars'
 
-export default class DataTable extends React.PureComponent {
+type Row = string[]
+
+interface DataTableProps {
+  labels: Row
+  rows: Row[]
+  selectedRow: Row
+  selectRow: (p: number) => void
+  filterRows: (p: ChangeEvent<HTMLInputElement>) => void
+  refreshData: () => void
+}
+
+interface TableRowProps {
+  row: Row
+  idx: number
+  isSelected: boolean
+  selectRow: (p: number) => void
+}
+
+export default class DataTable extends React.PureComponent<DataTableProps> {
   render() {
     const {
       labels,
@@ -51,7 +69,7 @@ export default class DataTable extends React.PureComponent {
   }
 }
 
-function TableHeader({ labels }) {
+function TableHeader({ labels }: { labels: Row }) {
   return (
     <thead>
       <tr className="table-header bb bw2">
@@ -71,7 +89,15 @@ function TableHeader({ labels }) {
   )
 }
 
-function TableRows({ rows, selectedRow, selectRow }) {
+function TableRows({
+  rows,
+  selectedRow,
+  selectRow,
+}: {
+  rows: Row[]
+  selectedRow: Row
+  selectRow: (p: number) => void
+}) {
   return (
     <tbody>
       {rows.map((row, idx) => (
@@ -87,7 +113,7 @@ function TableRows({ rows, selectedRow, selectRow }) {
   )
 }
 
-class TableRow extends React.PureComponent {
+class TableRow extends React.PureComponent<TableRowProps> {
   render() {
     const { isSelected, selectRow, row, idx } = this.props
     return (
