@@ -3,16 +3,11 @@ import Datastore from '@google-cloud/datastore'
 
 import ElectronStore from 'electron-store'
 
-enum LogType {
-  Error = 'error',
-  SaveSession = 'save-session',
-}
-
-interface Log {
+export interface Log {
   created: number
   sessionId: string
-  type: LogType
-  error: any
+  type: string // could be an enum, but would require frequent updates
+  payload: any
 }
 
 interface Logger {
@@ -59,7 +54,7 @@ export default function createLoger(store: ElectronStore): Logger {
 
   logger = Object.assign(log, {
     error: (payload: Partial<Log>) =>
-      log(Object.assign(payload, { type: LogType.Error })),
+      log(Object.assign(payload, { type: 'error' })),
     flush: function flushLogs(): Promise<void> {
       const now = Date.now()
       const localLogs = <Log[]>store.get('logs')
@@ -141,8 +136,10 @@ function storeSession(store: ElectronStore, sessionId: string) {
       store.set('logs', logs)
       if (logger) {
         logger({
-          type: LogType.SaveSession,
-          error,
+          type: 'save-session',
+          payload: {
+            error,
+          },
         })
       }
 

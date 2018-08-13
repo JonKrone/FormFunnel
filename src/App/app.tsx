@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import { join } from 'path'
 import { shell, remote, webFrame } from 'electron'
 import unhandled from 'electron-unhandled'
@@ -18,7 +18,9 @@ unhandled({
   logger: error => {
     log({
       type: 'unhandled-error',
-      error,
+      payload: {
+        error,
+      },
     })
   },
 })
@@ -26,8 +28,25 @@ unhandled({
 // Shhh. (simpler than changing base font/everything sizes)
 webFrame.setZoomFactor(0.9)
 
-export default class App extends React.Component {
-  constructor(props) {
+type Row = string[]
+
+interface AppProps {}
+
+interface AppState {
+  labels: Row
+  data: Row[]
+  filteredRows: Row[]
+
+  selectedIdx?: number
+  selectedRow: Row
+  selectedPDFs: string[]
+
+  outputRoot: string | null
+  isLoading: boolean
+}
+
+export default class App extends React.Component<AppProps, AppState> {
+  constructor(props: any) {
     super(props)
     this.state = {
       isLoading: true,
@@ -46,7 +65,7 @@ export default class App extends React.Component {
     this.removePDF = this.removePDF.bind(this)
     this.showFolderSelect = this.showFolderSelect.bind(this)
     this.refreshData = this.refreshData.bind(this)
-    this.filterRows = debounceFilter(this.filterRows.bind(this))
+    this.filterRows = debounceFilter(this.filterRows.bind(this), 700)
   }
 
   componentWillMount() {
@@ -71,7 +90,7 @@ export default class App extends React.Component {
     this.setState({ isLoading: true })
   }
 
-  selectRow(selectedIdx) {
+  selectRow(selectedIdx: number) {
     const rowData = this.state.filteredRows[selectedIdx]
     const isDeselecting = this.state.selectedRow === rowData
     const selectedRow = isDeselecting ? [] : rowData
@@ -88,7 +107,9 @@ export default class App extends React.Component {
 
     log({
       type: 'row-select',
-      idx: selectedIdx,
+      payload: {
+        idx: selectedIdx,
+      },
     })
   }
 
@@ -108,14 +129,13 @@ export default class App extends React.Component {
     }
 
     const pdfs = this.state.selectedPDFs
-    const labeledData = labelRows(this.state.labels, this.state.selectedRow)
-    const client = labeledData[0]
+    const client = labelRows(this.state.labels, this.state.selectedRow)
     const customerPath = join(client.Salesperson, client['Customer Name'])
     const outputFolder = join(this.state.outputRoot, customerPath)
 
     fillPDFs({
       pdfPaths: pdfs,
-      data: labeledData,
+      data: [client],
       outputFolder,
       quiet: true,
     })
@@ -123,14 +143,18 @@ export default class App extends React.Component {
         shell.showItemInFolder(filled[0])
         log({
           type: 'fill-pdf',
-          done: true,
+          payload: {
+            done: true,
+          },
         })
       })
       .catch(err => {
         log({
           type: 'fill-pdf',
-          error: err,
-          done: true,
+          payload: {
+            error: err,
+            done: true,
+          },
         })
 
         if (err.message.match(/does not exist/)) {
@@ -153,17 +177,21 @@ export default class App extends React.Component {
 
     log({
       type: 'fill-pdf',
-      done: false,
-      outputFolder,
-      pdfCount: pdfs.length,
+      payload: {
+        done: false,
+        outputFolder,
+        pdfCount: pdfs.length,
+      },
     })
   }
 
   addPDF() {
     log({
       type: 'add-pdf',
-      action: 'open',
-      utility: this.state.selectedRow[3],
+      payload: {
+        action: 'open',
+        utility: this.state.selectedRow[3],
+      },
     })
     dialog.showOpenDialog(
       {
@@ -178,8 +206,10 @@ export default class App extends React.Component {
         if (!selectedPDFs) {
           log({
             type: 'add-pdf',
-            action: 'cancel',
-            utility: this.state.selectedRow[3],
+            payload: {
+              action: 'cancel',
+              utility: this.state.selectedRow[3],
+            },
           })
           return
         }
@@ -200,15 +230,17 @@ export default class App extends React.Component {
 
         log({
           type: 'add-pdf',
-          action: 'close',
-          utility: this.state.selectedRow[3],
-          selectedCount: selectedPDFs.length,
+          payload: {
+            action: 'close',
+            utility: this.state.selectedRow[3],
+            selectedCount: selectedPDFs.length,
+          },
         })
       }
     )
   }
 
-  removePDF(path) {
+  removePDF(path: string) {
     const utility = this.state.selectedRow[3]
     const selectedPDFs = this.state.selectedPDFs.filter(
       pdfPath => pdfPath !== path
@@ -224,14 +256,18 @@ export default class App extends React.Component {
 
     log({
       type: 'remove-pdf',
-      utility,
+      payload: {
+        utility,
+      },
     })
   }
 
   showFolderSelect() {
     log({
       type: 'output-folder',
-      action: 'open',
+      payload: {
+        action: 'open',
+      },
     })
     dialog.showOpenDialog(
       { title: 'Where to save created PDF', properties: ['openDirectory'] },
@@ -239,7 +275,9 @@ export default class App extends React.Component {
         if (!folder) {
           log({
             type: 'output-folder',
-            action: 'cancel',
+            payload: {
+              action: 'cancel',
+            },
           })
           return
         }
@@ -247,15 +285,18 @@ export default class App extends React.Component {
         store.set('outputRoot', folder[0])
         log({
           type: 'output-folder',
-          action: 'select',
+          payload: {
+            action: 'select',
+          },
         })
       }
     )
   }
 
-  filterRows(value) {
+  filterRows(e: ChangeEvent<HTMLInputElement>) {
     // This is a bit naive and expensive. Should migrate to a worker
     const data = this.state.data
+    const value = e.target.value
     const filteredRows = data.filter(
       row => !!row.find(col => col.toLowerCase().includes(value))
     )
@@ -309,9 +350,9 @@ export default class App extends React.Component {
   }
 }
 
-let tid
-function debounceFilter(fn, ms) {
-  return function bouncer(event) {
+let tid: NodeJS.Timer
+function debounceFilter(fn: (p: string) => any, ms: number) {
+  return function bouncer(event: ChangeEvent<HTMLInputElement>) {
     const value = event.target.value.toLowerCase()
     clearTimeout(tid)
     tid = setTimeout(() => {
@@ -321,7 +362,7 @@ function debounceFilter(fn, ms) {
   }
 }
 
-function displayModal(options) {
+function displayModal(options: Electron.MessageBoxOptions) {
   const win = getCurrentWindow()
 
   return new Promise(resolve => {
