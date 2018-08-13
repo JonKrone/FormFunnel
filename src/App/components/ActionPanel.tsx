@@ -3,6 +3,16 @@ import React from 'react'
 import { shell } from 'electron'
 import cn from 'classnames'
 
+interface ActionPanelProps {
+  readyToFill: boolean
+  selectedPDFs: string[]
+  outputRoot: string | null
+  addPDF: () => void
+  showFolderSelect: () => void
+  removePDF: (p: string) => void
+  fillEm: () => void
+}
+
 export default function ActionPanel({
   readyToFill,
   selectedPDFs,
@@ -11,7 +21,7 @@ export default function ActionPanel({
   removePDF,
   fillEm,
   outputRoot,
-}) {
+}: ActionPanelProps) {
   const hasPDFs = !!selectedPDFs.length
   return (
     <div className="w-third action-panel">
@@ -55,7 +65,13 @@ export default function ActionPanel({
   )
 }
 
-function PDFCard({ path, removePDF }) {
+function PDFCard({
+  path,
+  removePDF,
+}: {
+  path: string
+  removePDF: (p: string) => void
+}) {
   const name = parse(path).name
   const cutoff = 30
   const prettyPath = name.length > cutoff ? `${name.slice(0, cutoff)}...` : name
