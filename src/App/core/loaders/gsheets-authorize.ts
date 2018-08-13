@@ -1,7 +1,7 @@
 import fs from 'fs'
 import { promisify } from 'util'
 import { parse } from 'url'
-import { google } from 'googleapis'
+import { google, oauth2_v2 } from 'googleapis'
 
 import electron from 'electron'
 import { join } from 'path'
@@ -20,7 +20,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
  * @param {function} callback The callback to call with the authorized client.
  */
 export default promisify(auth)
-function auth(callback) {
+function auth(callback: (error: any, p: any) => void) {
   const { client_secret, client_id, redirect_uris } = clientSecrets.installed
   const oAuth2Client = new google.auth.OAuth2(
     client_id,
@@ -33,18 +33,22 @@ function auth(callback) {
     if (err) return getNewToken(oAuth2Client, callback)
 
     console.log('found tokens in:', TOKEN_PATH)
-    oAuth2Client.setCredentials(JSON.parse(token))
+    oAuth2Client.setCredentials(JSON.parse(String(token)))
     return callback(null, oAuth2Client)
   })
 }
 
+// TODO: set oAuth2Client type correctly. Should be the type of `new google.auth.OAuth2` above
 /**
  * Get and store new token after prompting for user authorization, and then
  * execute the given callback with the authorized OAuth2 client.
  * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
-function getNewToken(oAuth2Client, callback) {
+function getNewToken(
+  oAuth2Client: any,
+  callback: (e: Error | null, p?: any) => void
+) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: SCOPES,
@@ -78,7 +82,7 @@ function getNewToken(oAuth2Client, callback) {
 
   authWindow.loadURL(authUrl)
 
-  function handleNavigation(url) {
+  function handleNavigation(url: string) {
     const query = parse(url, true).query
     if (query) {
       if (query.error) {
@@ -89,18 +93,21 @@ function getNewToken(oAuth2Client, callback) {
         setImmediate(() => authWindow.close())
 
         // This is the authorization code we need to request tokens
-        oAuth2Client.getToken(query.approvalCode, (err, token) => {
-          if (err) return callback(err)
-          oAuth2Client.setCredentials(token)
-          // Store the token to disk for later program executions
-          fs.writeFile(TOKEN_PATH, JSON.stringify(token), error => {
-            if (error) {
-              throw error
-            }
-            console.log('Token stored to', TOKEN_PATH)
-          })
-          return callback(null, oAuth2Client)
-        })
+        oAuth2Client.getToken(
+          query.approvalCode,
+          (err: Error, token: string) => {
+            if (err) return callback(err)
+            oAuth2Client.setCredentials(token)
+            // Store the token to disk for later program executions
+            fs.writeFile(TOKEN_PATH, JSON.stringify(token), error => {
+              if (error) {
+                throw error
+              }
+              console.log('Token stored to', TOKEN_PATH)
+            })
+            return callback(null, oAuth2Client)
+          }
+        )
       }
     }
   }
