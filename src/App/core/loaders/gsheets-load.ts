@@ -26,8 +26,8 @@ export async function loadFromGSheets(): GSheetLoadResult {
     })
 }
 
-export function labelRows(labels: string[], row: string[]): StringMap {
-  return row.reduce((client: StringMap, column, idx) => {
+export function labelRows(labels: string[], row: string[]): HashMap {
+  return row.reduce((client: HashMap, column, idx) => {
     const label = labels[idx]
     client[label] = column
     return client

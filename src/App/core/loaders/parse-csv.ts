@@ -25,7 +25,7 @@ export default async function parseCSV(path: string) {
       map[idx] = label
       return map
     },
-    {} as StringMap
+    {} as HashMap
   )
 
   const labeledRows = rows.map(row =>
@@ -35,7 +35,7 @@ export default async function parseCSV(path: string) {
         acc[colName] = column
         return acc
       },
-      {} as StringMap
+      {} as HashMap
     )
   )
 
