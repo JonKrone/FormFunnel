@@ -28,8 +28,6 @@ unhandled({
 // Shhh. (simpler than changing base font/everything sizes)
 webFrame.setZoomFactor(0.9)
 
-type Row = string[]
-
 interface AppProps {}
 
 interface AppState {

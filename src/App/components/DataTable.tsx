@@ -2,8 +2,6 @@ import React, { ChangeEvent } from 'react'
 import cn from 'classnames'
 import Scrollbars from 'react-custom-scrollbars'
 
-type Row = string[]
-
 interface DataTableProps {
   labels: Row
   rows: Row[]

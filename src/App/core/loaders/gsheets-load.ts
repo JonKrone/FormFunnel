@@ -8,19 +8,20 @@ const sheets = google.sheets('v4')
 const getValues = promisify(sheets.spreadsheets.values.get).bind(sheets)
 
 type GSheetLoadResult = Promise<{
-  labels: string[]
-  rows: string[][]
+  labels: Row
+  rows: Row[]
 }>
 export async function loadFromGSheets(): GSheetLoadResult {
+  // TODO: understand this TS quirk. It shouldn't require an arg because it is promisifed.
   return authorize()
-    .then(auth =>
+    .then((auth: any) =>
       getValues({
         spreadsheetId: config.sheets.indexSheetId,
         range: 'Index!A:ZZ',
         auth,
       })
     )
-    .then(res => {
+    .then((res: any) => {
       const [labels, ...rows] = res.data.values
       return { labels, rows }
     })
