@@ -3,7 +3,7 @@
   "productName": "Form Funnel",
   "version": "0.1.0-beta.2",
   "description": "Fill forms with Google Sheets data",
-  "main": "src/App/index.js",
+  "main": "src/App/index.ts",
   "author": "Jonathan Krone <jonathankrone@gmail.com>",
   "license": "ISC",
   "repository": {
@@ -18,6 +18,7 @@
   },
   "scripts": {
     "test": "node test/index.js",
+    "build-tsc": "tsc",
     "start": "electron-forge start",
     "debug": "electron-forge start  -- --inspect=5858",
     "package": "electron-forge package",
@@ -54,6 +55,7 @@
     "eslint-plugin-jsx-a11y": "^5",
     "eslint-plugin-react": "^7",
     "husky": "^0.14.3",
+    "ts-loader": "^4.4.2",
     "typescript": "^3.0.1"
   },
   "dependencies": {
