@@ -1,13 +1,14 @@
 import fs from 'fs'
 import { promisify } from 'util'
 import { parse } from 'url'
-import { google, oauth2_v2 } from 'googleapis'
+import { google } from 'googleapis'
 
 import electron from 'electron'
 import { join } from 'path'
 
 // Load client secrets from a local file.
 import clientSecrets from './../../../../secrets/client_secret.json'
+
 import { appDataPath } from '../util/util'
 
 // If modifying these scopes, delete clientSecrets.json.

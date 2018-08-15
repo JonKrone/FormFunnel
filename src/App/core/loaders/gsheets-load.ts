@@ -12,8 +12,9 @@ type GSheetLoadResult = Promise<{
   rows: Row[]
 }>
 export async function loadFromGSheets(): GSheetLoadResult {
-  // TODO: understand this TS quirk. It shouldn't require an arg because it is promisifed.
-  return authorize()
+  // TODO: understand this TS quirk. It shouldn't require callback because it is promisifed.
+  const noop = () => {}
+  return authorize(noop)
     .then((auth: any) =>
       getValues({
         spreadsheetId: config.sheets.indexSheetId,
