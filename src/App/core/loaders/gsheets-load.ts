@@ -13,15 +13,12 @@ type GSheetLoadResult = Promise<{
 }>
 export async function loadFromGSheets(): GSheetLoadResult {
   // TODO: understand this TS quirk. It shouldn't require callback because it is promisifed.
-  const noop = () => {}
-  return authorize(noop)
-    .then((auth: any) =>
-      getValues({
-        spreadsheetId: config.sheets.indexSheetId,
-        range: 'Index!A:ZZ',
-        auth,
-      })
-    )
+  return authorize()
+    .then((auth: any) => getValues({
+      spreadsheetId: config.sheets.indexSheetId,
+      range: 'Index!A:ZZ',
+      auth,
+    }))
     .then((res: any) => {
       const [labels, ...rows] = res.data.values
       return { labels, rows }
