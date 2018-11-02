@@ -72,7 +72,7 @@
     "googleapis": "^32.0.0",
     "pdffiller": "^0.0.10",
     "ramda": "^0.25.0",
-    "react": "^16.4.1",
+    "react": "^16.7.0-alpha.0",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^16.4.1",
     "react-hot-loader": "^3.0.0-beta.6",
